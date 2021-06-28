@@ -2,7 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.mcbbs.lh_lshen.chronicler.capabilities.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CapabilityItemList implements ICapabilityItemList {
-    private Map<String, Map<String,ItemStack>> itemAllMap;
+    private Map<String, Map<String,ItemStack>> itemAllMap = Maps.newHashMap();
 
     private Map<String,ItemStack> getItemMap(String item_id) {
         if (itemAllMap.containsKey(item_id)) {
@@ -20,6 +20,17 @@ public class CapabilityItemList implements ICapabilityItemList {
         }
         return null;
     }
+
+    @Override
+    public Map<String, Map<String, ItemStack>> getAllMap() {
+        return itemAllMap;
+    }
+
+    @Override
+    public void setAllMap(Map<String, Map<String, ItemStack>> map) {
+        this.itemAllMap = map;
+    }
+
     @Override
     public ItemStack getItemStack(String item_id, String id) {
         ItemStack stack = null;
@@ -88,6 +99,7 @@ public class CapabilityItemList implements ICapabilityItemList {
                 itemAllMap_nbt.put(id,stackMap_nbt);
             }
         }
+        this.itemAllMap = itemAllMap_nbt;
 
     }
 }

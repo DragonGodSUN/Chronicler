@@ -1,4 +1,4 @@
-package net.mcbbs.lh_lshen.chronicler.capabilities;
+package net.mcbbs.lh_lshen.chronicler.capabilities.api;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface ICapabilityItemList extends INBTSerializable<ListNBT> {
+    Map<String, Map<String,ItemStack>> getAllMap();
+    void setAllMap(Map<String, Map<String,ItemStack>> map);
     ItemStack getItemStack(String item_id, String id);
     void addItemStack(ItemStack itemStack, String id);
     void delItemStack(String item_id, int id);
