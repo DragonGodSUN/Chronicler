@@ -8,5 +8,5 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 public class ModCapability {
 
     @CapabilityInject(CapabilityItemList.class)
-    public static Capability<ICapabilityItemList> ITEMLIST_CAPABILITY;
+    public static Capability<ICapabilityItemList> ITEMLIST_CAPABILITY = null;
 }

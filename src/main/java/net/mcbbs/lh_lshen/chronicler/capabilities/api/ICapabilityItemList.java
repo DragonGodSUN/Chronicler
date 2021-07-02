@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface ICapabilityItemList extends INBTSerializable<ListNBT> {
-    Map<String, Map<String,ItemStack>> getAllMap();
-    void setAllMap(Map<String, Map<String,ItemStack>> map);
-    ItemStack getItemStack(String item_id, String id);
-    void addItemStack(ItemStack itemStack, String id);
-    void delItemStack(String item_id, int id);
+    Map<String, List<ItemStack>> getAllMap();
+    void setAllMap(Map<String, List<ItemStack>> map);
+    ItemStack getItemStack(String item_id,int index);
+    void addItemStack(ItemStack itemStack);
+    void setItemStack(ItemStack itemStack,int index);
+    void delItemStack(String item_id, int index);
 
 }

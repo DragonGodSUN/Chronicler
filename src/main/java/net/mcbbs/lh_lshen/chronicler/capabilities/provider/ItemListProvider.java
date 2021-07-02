@@ -7,6 +7,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -26,7 +27,6 @@ public class ItemListProvider implements ICapabilityProvider, INBTSerializable<L
     @Nonnull
     ICapabilityItemList getOrCreateCapability() {
         if (capabilityItemList == null) {
-            Random random = new Random();
             this.capabilityItemList = new CapabilityItemList();
         }
         return this.capabilityItemList;
