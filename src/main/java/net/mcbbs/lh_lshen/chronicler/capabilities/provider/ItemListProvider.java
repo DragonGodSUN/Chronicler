@@ -41,4 +41,5 @@ public class ItemListProvider implements ICapabilityProvider, INBTSerializable<L
     public void deserializeNBT(ListNBT nbt) {
         getOrCreateCapability().deserializeNBT(nbt);
     }
+
 }

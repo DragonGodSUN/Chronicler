@@ -4,19 +4,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
-import net.mcbbs.lh_lshen.chronicler.items.ItemChronicle;
+import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicier;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -27,6 +26,14 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonEventHandler {
+    public static ContainerType<ContainerChronicier> containerTypeChronicler;
+
+    @SubscribeEvent
+    public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
+        containerTypeChronicler = IForgeContainerType.create(ContainerChronicier::createContainerClientSide);
+        containerTypeChronicler.setRegistryName("mbe32_container_registry_name");
+        event.getRegistry().register(containerTypeChronicler);
+    }
 
     @SubscribeEvent
     public static void onCapabilitySetupEvent(FMLCommonSetupEvent event) {
@@ -42,7 +49,7 @@ public class CommonEventHandler {
                                 for (ItemStack itemStack:entry.getValue()){
                                     CompoundNBT itemTag = new CompoundNBT();
                                     itemTag.putString("item_id",entry.getKey());
-                                    itemTag.putInt("stack_index",entry.getValue().indexOf(itemStack));
+//                                    itemTag.putInt("stack_index",entry.getValue().indexOf(itemStack));
                                     itemStack.save(itemTag);
                                     nbtTagList.add(itemTag);
                                 }
@@ -61,10 +68,11 @@ public class CommonEventHandler {
                                     if (tag instanceof CompoundNBT){
                                         CompoundNBT itemNbt = (CompoundNBT) tag;
                                         String id = itemNbt.getString("item_id");
-                                        int index = itemNbt.getInt("stack_index");
+//                                        int index = itemNbt.getInt("stack_index");
                                         ItemStack stack = ItemStack.of(itemNbt);
                                         id_list.add(id);
-                                        stackList_nbt.set(index,stack);
+                                        stackList_nbt.add(stack);
+//                                        stackList_nbt.set(index,stack);
                                     }
                                 }
                                 for (ItemStack itemStack:stackList_nbt){
@@ -84,6 +92,8 @@ public class CommonEventHandler {
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(ChroniclerNetwork::registerMessage);
     }
+
+
 
 //    @SubscribeEvent
 //    public static void onAttachCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {

@@ -9,4 +9,5 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Utils.MOD_ID);
     public static final RegistryObject<Item> chronicle = ITEMS.register("chronicle", ItemChronicle::new);
+
 }

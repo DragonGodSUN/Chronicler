@@ -1,6 +1,8 @@
 package net.mcbbs.lh_lshen.chronicler.helper;
 
+import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -74,6 +76,31 @@ public class StoreHelper {
             int index = getStackIndex(capabilityItemList,itemStack);
             capabilityItemList.delItemStack(itemStack.getItem().getRegistryName().toString(),index);
         }
+    }
+
+    public static Inventory getAllInventory(Map<String, List<ItemStack>> allItemMap){
+        List<ItemStack> itemStackList_All = Lists.newArrayList();
+        for (Map.Entry<String,List<ItemStack>> entry : allItemMap.entrySet()){
+            List<ItemStack> list = entry.getValue();
+            itemStackList_All.addAll(list);
+        }
+        Inventory inventory = new Inventory(itemStackList_All.size());
+        for (ItemStack stack:itemStackList_All) {
+            inventory.addItem(stack);
+        }
+        return inventory;
+    }
+
+    public static Inventory getSingerInventory(Map<String, List<ItemStack>> allItemMap, String item_id){
+        List<ItemStack> itemStackList_All = Lists.newArrayList();
+        if (allItemMap.containsKey(item_id)) {
+            itemStackList_All = allItemMap.get(item_id);
+        }
+        Inventory inventory = new Inventory(itemStackList_All.size());
+        for (ItemStack stack:itemStackList_All) {
+            inventory.addItem(stack);
+        }
+        return inventory;
     }
 
 }

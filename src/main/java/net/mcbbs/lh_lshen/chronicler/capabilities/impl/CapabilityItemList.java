@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class CapabilityItemList implements ICapabilityItemList {
     private Map<String, List<ItemStack>> itemAllMap = Maps.newHashMap();
+    private boolean isDirty;
 
     public CapabilityItemList() {
     }
@@ -83,6 +84,18 @@ public class CapabilityItemList implements ICapabilityItemList {
         }
     }
 
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        isDirty = dirty;
+    }
+
+    public void markDirty(){
+        setDirty(true);
+    }
+
     @Override
     public ListNBT serializeNBT() {
         ListNBT nbtTagList = new ListNBT();
@@ -90,7 +103,7 @@ public class CapabilityItemList implements ICapabilityItemList {
             for (ItemStack itemStack:entry.getValue()){
                 CompoundNBT itemTag = new CompoundNBT();
                 itemTag.putString("item_id",entry.getKey());
-                itemTag.putInt("stack_index",entry.getValue().indexOf(itemStack));
+//                itemTag.putInt("stack_index",entry.getValue().indexOf(itemStack));
                 itemStack.save(itemTag);
                 nbtTagList.add(itemTag);
             }
@@ -107,12 +120,12 @@ public class CapabilityItemList implements ICapabilityItemList {
             if (tag instanceof CompoundNBT){
                 CompoundNBT itemNbt = (CompoundNBT) tag;
                 String id = itemNbt.getString("item_id");
-                int stack_id = itemNbt.getInt("stack_index");
+//                int stack_id = itemNbt.getInt("stack_index");
                 ItemStack stack = ItemStack.of(itemNbt);
                 if (!stack.isEmpty()) {
                     id_list.add(id);
                     itemStackList.add(stack);
-                    itemStackList.set(stack_id,stack);
+//                    itemStackList.set(stack_id,stack);
                 }
 
             }
