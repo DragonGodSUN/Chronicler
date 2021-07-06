@@ -1,4 +1,4 @@
-package net.mcbbs.lh_lshen.chronicler;
+package net.mcbbs.lh_lshen.chronicler.events;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,7 +31,7 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
         containerTypeChronicler = IForgeContainerType.create(ContainerChronicier::createContainerClientSide);
-        containerTypeChronicler.setRegistryName("mbe32_container_registry_name");
+        containerTypeChronicler.setRegistryName("container_chronicler");
         event.getRegistry().register(containerTypeChronicler);
     }
 
@@ -75,10 +75,16 @@ public class CommonEventHandler {
 //                                        stackList_nbt.set(index,stack);
                                     }
                                 }
-                                for (ItemStack itemStack:stackList_nbt){
-                                    String id = itemStack.getItem().getRegistryName().toString();
-                                    if (id_list.contains(id)){
-                                        itemAllMap_nbt.put(id,stackList_nbt);
+                                if (!stackList_nbt.isEmpty()) {
+                                    for (String id : id_list) {
+                                        List<ItemStack> stackList = Lists.newArrayList();
+                                        for (ItemStack stack : stackList_nbt) {
+                                            String stack_id = stack.getItem().getRegistryName().toString();
+                                            if (id.equals(stack_id)){
+                                                stackList.add(stack);
+                                            }
+                                        }
+                                        itemAllMap_nbt.put(id,stackList);
                                     }
                                 }
                                 instance.setAllMap(itemAllMap_nbt);

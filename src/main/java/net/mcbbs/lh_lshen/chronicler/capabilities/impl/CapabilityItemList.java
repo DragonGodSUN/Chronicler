@@ -54,24 +54,37 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public void addItemStack(ItemStack itemStack) {
         List<ItemStack> itemList = getItemList(itemStack.getItem().getRegistryName().toString());
+        ItemStack itemStack1 = itemStack.copy();
+        itemStack1.setCount(1);
         if (itemList != null){
-            itemList.add(itemStack);
+            boolean isUnique = true;
+            for (ItemStack i:itemList){
+                if (i.equals(itemStack1,false)) {
+                    isUnique = false;
+                    break;
+                }
+            }
+            if (isUnique && itemList.size()<=8) {
+                itemList.add(itemStack1);
+            }
         }else {
             List<ItemStack> itemList_new = Lists.newArrayList();
-            itemList_new.add(itemStack);
-            itemAllMap.put(itemStack.getItem().getRegistryName().toString(),itemList_new);
+            itemList_new.add(itemStack1);
+            itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
         }
     }
 
     @Override
     public void setItemStack(ItemStack itemStack, int index) {
         List<ItemStack> itemList = getItemList(itemStack.getItem().getRegistryName().toString());
+        ItemStack itemStack1 = itemStack.copy();
+        itemStack1.setCount(1);
         if (itemList != null){
-            itemList.set(index,itemStack);
+            itemList.set(index,itemStack1);
         }else {
             List<ItemStack> itemList_new = Lists.newArrayList();
-            itemList_new.set(index,itemStack);
-            itemAllMap.put(itemStack.getItem().getRegistryName().toString(),itemList_new);
+            itemList_new.set(index,itemStack1);
+            itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
         }
     }
 
@@ -124,18 +137,24 @@ public class CapabilityItemList implements ICapabilityItemList {
                 ItemStack stack = ItemStack.of(itemNbt);
                 if (!stack.isEmpty()) {
                     id_list.add(id);
-                    itemStackList.add(stack);
+                    if (!itemStackList.contains(stack)) {
+                        itemStackList.add(stack);
+                    }
 //                    itemStackList.set(stack_id,stack);
                 }
 
             }
         }
         if (!itemStackList.isEmpty()) {
-            for (ItemStack itemStack:itemStackList){
-                String id = itemStack.getItem().getRegistryName().toString();
-                if (id_list.contains(id)){
-                    itemAllMap_nbt.put(id,itemStackList);
+            for (String id : id_list) {
+                List<ItemStack> stackList = Lists.newArrayList();
+                for (ItemStack stack : itemStackList) {
+                    String stack_id = stack.getItem().getRegistryName().toString();
+                    if (id.equals(stack_id)){
+                        stackList.add(stack);
+                    }
                 }
+                itemAllMap_nbt.put(id,stackList);
             }
         }
         this.itemAllMap = itemAllMap_nbt;

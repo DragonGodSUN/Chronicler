@@ -84,21 +84,26 @@ public class StoreHelper {
             List<ItemStack> list = entry.getValue();
             itemStackList_All.addAll(list);
         }
-        Inventory inventory = new Inventory(itemStackList_All.size());
-        for (ItemStack stack:itemStackList_All) {
-            inventory.addItem(stack);
+        if (itemStackList_All.size()>0) {
+            Inventory inventory = new Inventory();
+            for (ItemStack stack:itemStackList_All) {
+                inventory.addItem(stack);
+            }
+            return inventory;
         }
-        return inventory;
+        return new Inventory(8);
     }
 
     public static Inventory getSingerInventory(Map<String, List<ItemStack>> allItemMap, String item_id){
-        List<ItemStack> itemStackList_All = Lists.newArrayList();
+        List<ItemStack> itemStackList = Lists.newArrayList();
         if (allItemMap.containsKey(item_id)) {
-            itemStackList_All = allItemMap.get(item_id);
+            itemStackList = allItemMap.get(item_id);
         }
-        Inventory inventory = new Inventory(itemStackList_All.size());
-        for (ItemStack stack:itemStackList_All) {
-            inventory.addItem(stack);
+        Inventory inventory = new Inventory(8);
+        for (ItemStack stack:itemStackList) {
+            if (stack.getItem().getRegistryName().toString().equals(item_id)) {
+                inventory.addItem(stack);
+            }
         }
         return inventory;
     }
