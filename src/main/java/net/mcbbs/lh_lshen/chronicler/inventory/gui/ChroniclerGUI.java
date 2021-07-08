@@ -26,8 +26,10 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicier> {
     SliderPercentageOption sliderPercentageOption;
     Widget sliderBar;
 
+
     public ChroniclerGUI(ContainerChronicier container, PlayerInventory playerInv, ITextComponent title) {
         super(container, playerInv, title);
+        
     }
 
 

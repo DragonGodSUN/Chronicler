@@ -3,6 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

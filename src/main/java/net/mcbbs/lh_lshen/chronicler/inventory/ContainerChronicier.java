@@ -26,8 +26,10 @@ public class ContainerChronicier extends Container {
 
     private CapabilityItemList cap_list;
     private ItemStack itemStack;
-    private Map<String, List<ItemStack>> allItemMap = Maps.newHashMap();
+    private Map<String, List<ItemStack>> allItemMap;
+    private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
+    public SelectCompnent selectCompnent = new SelectCompnent();
     protected ContainerChronicier(int windowId, PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
                                   ItemStack itemStack) {
@@ -35,8 +37,10 @@ public class ContainerChronicier extends Container {
         this.cap_list = cap_list;
         this.itemStack = itemStack;
         this.allItemMap = cap_list.getAllMap();
-        itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY).ifPresent((c)->{
-        });
+        if (itemStack.getItem() instanceof ItemChronicler) {
+            this.selectCompnent = ((ItemChronicler) itemStack.getItem()).getSelectCompnent(itemStack);
+        }
+        this.inventory_player = playerInv;
         makeInventories();
         addSlots();
     }
@@ -44,13 +48,14 @@ public class ContainerChronicier extends Container {
     private void addSlots(){
         final int SLOT_X_SPACING = 18;
         final int SLOT_Y_SPACING = 18;
-        final int LIST_XPOS = 10;
-        final int LIST_YPOS = 20;
+        final int LIST_XPOS = 110;
+        final int LIST_YPOS = 15;
+        int page = selectCompnent.getPage();
         List<String> keys = Lists.newArrayList();
         keys.addAll(allItemMap.keySet());
-        for (int j =0;j<12;j++) {
+        for (int j =0;j<8;j++) {
             if (j<keys.size()) {
-                Inventory inventory = inventories.get(j);
+                Inventory inventory = inventories.get( page*8 + j );
                 for (int i = 0; i<8; i++){
                     addSlot(new SlotChronicler(inventory,i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j));
                 }
@@ -79,9 +84,15 @@ public class ContainerChronicier extends Container {
     @Override
     public ItemStack clicked(int slot, int player_slot, ClickType clickType, PlayerEntity playerEntity) {
         if (slot>=0) {
-            ItemStack itemStack = this.slots.get(slot).getItem();
-            if (itemStack!=null && playerEntity !=null){
-               playerEntity.drop(itemStack,true);
+            ItemStack itemStackSelect = this.slots.get(slot).getItem();
+            if (itemStackSelect!=null && playerEntity !=null){
+               playerEntity.drop(itemStackSelect,true);
+               selectCompnent.selectSlot(slot);
+               selectCompnent.page+=1;
+                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
+            }else {
+               selectCompnent.page-=1;
+                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
             }
         }
         return super.clicked(slot, player_slot, clickType, playerEntity);
@@ -133,10 +144,11 @@ public class ContainerChronicier extends Container {
     @Override
     public void broadcastChanges() {
         if (cap_list!=null && cap_list.isDirty()) {
-            CompoundNBT nbt = itemStack.getOrCreateTag();
-            int dirtyCounter = nbt.getInt("dirtyCounter");
-            nbt.putInt("dirtyCounter", dirtyCounter + 1);
-            itemStack.setTag(nbt);
+//            CompoundNBT nbt = itemStack.getOrCreateTag();
+//            int dirtyCounter = nbt.getInt("dirtyCounter");
+//            nbt.putInt("dirtyCounter", dirtyCounter + 1);
+//            itemStack.setTag(nbt);
+
             cap_list.setDirty(false);
         }
         super.broadcastChanges();

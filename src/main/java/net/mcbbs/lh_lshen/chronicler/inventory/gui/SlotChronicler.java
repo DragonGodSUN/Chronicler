@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 public class SlotChronicler extends Slot {
     public SlotChronicler(IInventory inventory, int slotNumber, int x_pos, int y_pos) {
         super(inventory,slotNumber,x_pos,y_pos);
+        set(inventory.getItem(slotNumber));
     }
 
     @Override

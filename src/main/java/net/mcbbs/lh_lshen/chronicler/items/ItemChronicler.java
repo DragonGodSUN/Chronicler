@@ -1,11 +1,14 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicier;
+import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -25,13 +28,12 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemChronicler extends Item {
     public ItemChronicler() {
         super(new Properties().tab(ItemGroup.TAB_TOOLS).fireResistant().stacksTo(1));
     }
-    private final String BASE_NBT_TAG = "base";
-    private final String CAPABILITY_NBT_TAG = "cap";
 
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity entity, Hand hand) {
@@ -62,7 +64,6 @@ public class ItemChronicler extends Item {
                                         packetBuffer.writeNbt(nbt);
                                     }
                                 }
-
                             });
                 }
             }
@@ -91,6 +92,72 @@ public class ItemChronicler extends Item {
         return (CapabilityItemList) cap_list;
     }
 
+    public SelectCompnent getSelectCompnent(ItemStack stack) {
+        CompoundNBT nbt = stack.getShareTag();
+        SelectCompnent selectCompnent = new SelectCompnent();
+        if (nbt != null) {
+            int page = nbt.getInt("page");
+            int slot = nbt.getInt("slot_select");
+            int slot_size = nbt.getInt("slot_size");
+            List<Integer> stack_list = Lists.newArrayList();
+            for (int i=0;i<slot_size;i++) {
+                int stack_unit = nbt.getInt("stack_list:"+i);
+                stack_list.add(stack_unit);
+            }
+        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
+            if (capabilityItemList!=null){
+                selectCompnent = new SelectCompnent(page,stack_list,capabilityItemList);
+                selectCompnent.selectSlot(slot);
+            }
+        }
+        return selectCompnent;
+    }
+
+    public void setSelectCompnent(ItemStack stack, SelectCompnent selectCompnent) {
+        CompoundNBT nbt = stack.getShareTag();
+        nbt.putInt("page",selectCompnent.page);
+        nbt.putInt("slot_select",selectCompnent.selectSlot);
+        nbt.putInt("stack_size",selectCompnent.stack_list.size());
+        for (int i=0;i<selectCompnent.stack_list.size();i++) {
+            nbt.putInt("stack_list:"+i,selectCompnent.stack_list.get(i));
+        }
+
+    }
+
+//    @Nullable
+//    @Override
+//    public CompoundNBT getShareTag(ItemStack stack) {
+//        CompoundNBT nbt = new CompoundNBT();
+//        SelectCompnent selectCompnent = getSelectCompnent(stack);
+//        nbt.putInt("page",selectCompnent.page);
+//        nbt.putInt("slot_select",selectCompnent.selectSlot);
+//        nbt.putInt("stack_size",selectCompnent.stack_list.size());
+//        for (int i=0;i<selectCompnent.stack_list.size();i++) {
+//            nbt.putInt("stack_list:"+i,selectCompnent.stack_list.get(i));
+//        }
+//        return nbt;
+//    }
+
+//    @Override
+//    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+//        SelectCompnent selectCompnent = new SelectCompnent();
+//        if (nbt != null) {
+//            int page = nbt.getInt("page");
+//            int slot = nbt.getInt("slot_select");
+//            int slot_size = nbt.getInt("slot_size");
+//            List<Integer> stack_list = Lists.newArrayList();
+//            for (int i=0;i<slot_size;i++) {
+//                int stack_unit = nbt.getInt("stack_list:"+i);
+//                stack_list.add(stack_unit);
+//            }
+//        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
+//        if (capabilityItemList!=null){
+//            selectCompnent = new SelectCompnent(page,stack_list,capabilityItemList);
+//            selectCompnent.selectSlot(slot);
+//            }
+//        }
+//        super.readShareTag(stack, nbt);
+//    }
 
     @Nullable
     @Override
