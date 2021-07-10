@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicier;
+import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.ItemStack;
@@ -26,11 +26,11 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonEventHandler {
-    public static ContainerType<ContainerChronicier> containerTypeChronicler;
+    public static ContainerType<ContainerChronicler> containerTypeChronicler;
 
     @SubscribeEvent
     public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
-        containerTypeChronicler = IForgeContainerType.create(ContainerChronicier::createContainerClientSide);
+        containerTypeChronicler = IForgeContainerType.create(ContainerChronicler::createContainerClientSide);
         containerTypeChronicler.setRegistryName("container_chronicler");
         event.getRegistry().register(containerTypeChronicler);
     }

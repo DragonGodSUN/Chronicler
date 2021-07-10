@@ -5,9 +5,8 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
-import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
-import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicier;
+import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -18,7 +17,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -71,12 +69,12 @@ public class ItemChronicler extends Item {
         return ActionResult.success(itemStack);
     }
 
-    public ListNBT getListNBT(ItemStack stack) {
+    public static ListNBT getListNBT(ItemStack stack) {
         CapabilityItemList itemListCapability = getItemListCapability(stack);
         return itemListCapability.serializeNBT();
     }
 
-    public void readListNBT(ItemStack stack, @Nullable ListNBT nbt) {
+    public static void readListNBT(ItemStack stack, @Nullable ListNBT nbt) {
         if (nbt != null) {
             CapabilityItemList capabilityItemList = getItemListCapability(stack);
             capabilityItemList.deserializeNBT(nbt);
@@ -84,7 +82,7 @@ public class ItemChronicler extends Item {
     }
 
 
-    public CapabilityItemList getItemListCapability(ItemStack itemStack){
+    public static CapabilityItemList getItemListCapability(ItemStack itemStack){
         ICapabilityItemList cap_list = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
         if (cap_list == null || !(cap_list instanceof ICapabilityItemList)) {
             return new CapabilityItemList();
@@ -115,28 +113,25 @@ public class ItemChronicler extends Item {
 
     public void setSelectCompnent(ItemStack stack, SelectCompnent selectCompnent) {
         CompoundNBT nbt = stack.getShareTag();
-        nbt.putInt("page",selectCompnent.page);
-        nbt.putInt("slot_select",selectCompnent.selectSlot);
-        nbt.putInt("stack_size",selectCompnent.stack_list.size());
-        for (int i=0;i<selectCompnent.stack_list.size();i++) {
-            nbt.putInt("stack_list:"+i,selectCompnent.stack_list.get(i));
+        if (nbt !=null && selectCompnent != null) {
+            nbt.putInt("page",selectCompnent.page);
+            nbt.putInt("slot_select",selectCompnent.selectSlot);
+            nbt.putInt("stack_size",selectCompnent.stack_list.size());
+            for (int i=0;i<selectCompnent.stack_list.size();i++) {
+                nbt.putInt("stack_list:"+i,selectCompnent.stack_list.get(i));
+            }
         }
 
     }
 
-//    @Nullable
-//    @Override
-//    public CompoundNBT getShareTag(ItemStack stack) {
-//        CompoundNBT nbt = new CompoundNBT();
-//        SelectCompnent selectCompnent = getSelectCompnent(stack);
-//        nbt.putInt("page",selectCompnent.page);
-//        nbt.putInt("slot_select",selectCompnent.selectSlot);
-//        nbt.putInt("stack_size",selectCompnent.stack_list.size());
-//        for (int i=0;i<selectCompnent.stack_list.size();i++) {
-//            nbt.putInt("stack_list:"+i,selectCompnent.stack_list.get(i));
-//        }
-//        return nbt;
-//    }
+    @Nullable
+    @Override
+    public CompoundNBT getShareTag(ItemStack stack) {
+        if (super.getShareTag(stack) == null) {
+            return new CompoundNBT();
+        }
+        return super.getShareTag(stack);
+    }
 
 //    @Override
 //    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
@@ -169,6 +164,7 @@ public class ItemChronicler extends Item {
         public ContainerProviderChronicler(ItemChronicler itemChronicler, ItemStack itemStackChronicler) {
             this.itemChronicler = itemChronicler;
             this.itemStackChronicler = itemStackChronicler;
+
         }
 
         @Override
@@ -178,15 +174,13 @@ public class ItemChronicler extends Item {
 
         @Override
         public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-            ContainerChronicier newContainerServerSide =
-                    ContainerChronicier.createContainerServerSide(windowID, playerInventory,
+            ContainerChronicler newContainerServerSide =
+                    ContainerChronicler.createContainerServerSide(windowID, playerInventory,
                             itemChronicler.getItemListCapability(itemStackChronicler),
                             itemStackChronicler);
-            if (newContainerServerSide!= null){
-            System.out.println("creatmunu___________"+newContainerServerSide.slots);
-            }
             return newContainerServerSide;
         }
+
 
         private ItemChronicler itemChronicler;
         private ItemStack itemStackChronicler;

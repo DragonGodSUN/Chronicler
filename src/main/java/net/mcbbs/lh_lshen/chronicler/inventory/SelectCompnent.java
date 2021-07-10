@@ -5,6 +5,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 
 import java.util.List;
 
@@ -12,7 +13,8 @@ public class SelectCompnent {
     public int page;
     public List<Integer> stack_list = Lists.newArrayList();;
     public int selectSlot;
-    private ICapabilityItemList cap_list;
+    public ItemStack selectItemStack = ItemStack.EMPTY;
+    private ICapabilityItemList cap_list = new CapabilityItemList();
 
     public SelectCompnent() {
     }
@@ -25,6 +27,14 @@ public class SelectCompnent {
 
     public void selectSlot(int slot){
         this.selectSlot = slot;
+    }
+
+    public void setSelectItemStack(ItemStack selectItemStack) {
+        this.selectItemStack = selectItemStack;
+    }
+
+    public ItemStack getSelectItem(){
+        return selectItemStack;
     }
 
     public void setCapability(ICapabilityItemList cap_list) {

@@ -2,6 +2,8 @@ package net.mcbbs.lh_lshen.chronicler.helper;
 
 import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
+import net.mcbbs.lh_lshen.chronicler.network.packages.SynCapMessage;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,7 +19,11 @@ public class StoreHelper {
             String item_reg_id = itemStack.getItem().getRegistryName().toString();
             if (allMap.containsKey(item_reg_id)){
                 List<ItemStack> stackList = allMap.get(item_reg_id);
-                return stackList.contains(itemStack);
+                for (ItemStack s : stackList) {
+                    itemStack.equals(s,false);
+                    return true;
+                }
+                return false;
             }
         }
         return false;
@@ -27,13 +33,19 @@ public class StoreHelper {
         return capabilityItemList.getItemStack(item_id,index);
     }
 
+    public static List<ItemStack> getItemStackList(ICapabilityItemList capabilityItemList, ItemStack itemStack){
+        return capabilityItemList.getAllMap().get(itemStack.getItem().getRegistryName().toString());
+    }
+
     public static int getStackIndex(ICapabilityItemList capabilityItemList, ItemStack itemStack){
         Map<String, List<ItemStack>> allMap = capabilityItemList.getAllMap();
         String item_reg_id = itemStack.getItem().getRegistryName().toString();
         if(!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
             List<ItemStack> stackList = allMap.get(item_reg_id);
-            if (stackList.contains(itemStack)) {
-                return stackList.indexOf(itemStack);
+            for (int s =0;s<stackList.size();s++) {
+                if (stackList.get(s).equals(itemStack,false)){
+                    return s;
+                }
             }
         }
         return 0;
@@ -57,10 +69,25 @@ public class StoreHelper {
         if (!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
             int index_select = getStackIndex(capabilityItemList,itemStack);
             String item_reg_id = itemStack.getItem().getRegistryName().toString();
-            ItemStack itemStack1 = capabilityItemList.getItemStack(item_reg_id,index_select+1);
+            int size = capabilityItemList.getAllMap().get(item_reg_id).size();
+            if (index_select < size-1) {
+                ItemStack itemStack1 = capabilityItemList.getItemStack(item_reg_id,index_select+1);
+                if(!itemStack1.isEmpty()){
+                    capabilityItemList.setItemStack(itemStack1,index_select);
+                    capabilityItemList.setItemStack(itemStack,index_select+1);
+                }
+            }
+        }
+    }
+
+    public static void setFirstIndex(ICapabilityItemList capabilityItemList, ItemStack itemStack){
+        if (!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
+            int index_select = getStackIndex(capabilityItemList,itemStack);
+            String item_reg_id = itemStack.getItem().getRegistryName().toString();
+            ItemStack itemStack1 = capabilityItemList.getItemStack(item_reg_id,0);
             if(!itemStack1.isEmpty()){
                 capabilityItemList.setItemStack(itemStack1,index_select);
-                capabilityItemList.setItemStack(itemStack,index_select+1);
+                capabilityItemList.setItemStack(itemStack,0);
             }
         }
     }
@@ -106,6 +133,10 @@ public class StoreHelper {
             }
         }
         return inventory;
+    }
+
+    public static void synCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
+        ChroniclerNetwork.INSTANCE.sendToServer(new SynCapMessage(chronicler,capabilityItemList));
     }
 
 }

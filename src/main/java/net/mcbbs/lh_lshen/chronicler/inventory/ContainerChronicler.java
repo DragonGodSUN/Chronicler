@@ -1,9 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.inventory;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
-import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotChronicler;
@@ -22,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class ContainerChronicier extends Container {
+public class ContainerChronicler extends Container {
 
     private CapabilityItemList cap_list;
     private ItemStack itemStack;
@@ -30,7 +28,8 @@ public class ContainerChronicier extends Container {
     private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
     public SelectCompnent selectCompnent = new SelectCompnent();
-    protected ContainerChronicier(int windowId, PlayerInventory playerInv,
+    public boolean selectBoxOpen;
+    protected ContainerChronicler(int windowId, PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
                                   ItemStack itemStack) {
         super(CommonEventHandler.containerTypeChronicler, windowId);
@@ -41,69 +40,71 @@ public class ContainerChronicier extends Container {
             this.selectCompnent = ((ItemChronicler) itemStack.getItem()).getSelectCompnent(itemStack);
         }
         this.inventory_player = playerInv;
-        makeInventories();
-        addSlots();
+        loadSlots();
     }
 
-    private void addSlots(){
+    public void loadSlots(){
+        this.slots.clear();
+        loadInventories();
+        addCapabilitySlots();
+    }
+
+    private void loadInventories(){
+        List<String> keys = Lists.newArrayList();
+        List<Inventory> inventories_new = Lists.newArrayList();
+        keys.addAll(allItemMap.keySet());
+        for (int i =0;i<keys.size();i++) {
+            Inventory inventory = StoreHelper.getSingerInventory(allItemMap,keys.get(i));
+            inventories_new.add(inventory);
+        }
+        this.inventories = inventories_new;
+    }
+
+    private void addCapabilitySlots(){
         final int SLOT_X_SPACING = 18;
         final int SLOT_Y_SPACING = 18;
-        final int LIST_XPOS = 110;
-        final int LIST_YPOS = 15;
+        final int LIST_XPOS = 152;
+        final int LIST_YPOS = 18;
         int page = selectCompnent.getPage();
         List<String> keys = Lists.newArrayList();
         keys.addAll(allItemMap.keySet());
         for (int j =0;j<8;j++) {
             if (j<keys.size()) {
-                Inventory inventory = inventories.get( page*8 + j );
-                for (int i = 0; i<8; i++){
+                Inventory inventory = inventories.get( j );
+                for (int i = 0; i<4; i++){
                     addSlot(new SlotChronicler(inventory,i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j));
                 }
             }
         }
-//        int y = 0;
-//        for (Map.Entry<String,List<ItemStack>> entry : allItemMap.entrySet()){
-//            Inventory inventory = StoreHelper.getSingerInventory(allItemMap,entry.getKey());
-//            System.out.println(y+"--"+entry.getKey()+"--"+inventory.getContainerSize()+"--"+inventory);
-//            for (int i=0;i<inventory.getContainerSize();i++){
-//                addSlot(new SlotChronicler(inventory,i, LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * y));
-//            }
-//            y++;
-//        }
     }
 
-    private void makeInventories(){
-        List<String> keys = Lists.newArrayList();
-        keys.addAll(allItemMap.keySet());
-        for (int i =0;i<keys.size();i++) {
-            Inventory inventory = StoreHelper.getSingerInventory(allItemMap,keys.get(i));
-            this.inventories.add(inventory);
-        }
-    }
 
     @Override
     public ItemStack clicked(int slot, int player_slot, ClickType clickType, PlayerEntity playerEntity) {
-        if (slot>=0) {
+        if (clickType == ClickType.PICKUP) {
             ItemStack itemStackSelect = this.slots.get(slot).getItem();
-            if (itemStackSelect!=null && playerEntity !=null){
-               playerEntity.drop(itemStackSelect,true);
+            if (!itemStackSelect.isEmpty() && playerEntity !=null){
                selectCompnent.selectSlot(slot);
-               selectCompnent.page+=1;
-                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
-            }else {
-               selectCompnent.page-=1;
-                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
+               this.selectBoxOpen = true;
+//                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
             }
+        }else {
+            this.selectBoxOpen =false;
         }
-        return super.clicked(slot, player_slot, clickType, playerEntity);
+        return super.clicked(slot,player_slot,clickType,playerEntity);
     }
 
-    public static ContainerChronicier createContainerServerSide(int windowID, PlayerInventory playerInventory, CapabilityItemList cap_list,
+    @Override
+    public boolean canTakeItemForPickAll(ItemStack p_94530_1_, Slot p_94530_2_) {
+        return false;
+    }
+
+    public static ContainerChronicler createContainerServerSide(int windowID, PlayerInventory playerInventory, CapabilityItemList cap_list,
                                                                 ItemStack itemStack) {
-        return new ContainerChronicier(windowID, playerInventory, cap_list, itemStack);
+        return new ContainerChronicler(windowID, playerInventory, cap_list, itemStack);
     }
 
-    public static ContainerChronicier createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
+    public static ContainerChronicler createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
         ItemStack stack = extraData.readItem();
         int size = extraData.readInt();
         ListNBT listNBT = new ListNBT();
@@ -119,12 +120,12 @@ public class ContainerChronicier extends Container {
             if (capabilityItemList!=null) {
                 System.out.println("tag-list:"+listNBT);
                 System.out.println("tag-map:"+capabilityItemList.getAllMap());
-                return new ContainerChronicier(windowID, playerInventory, capabilityItemList, stack);
+                return new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
             }
             } catch (IllegalArgumentException iae) {
                 Logger.getGlobal().info(iae.toString());
             }
-            return new ContainerChronicier(windowID, playerInventory, capabilityItemList, ItemStack.EMPTY);
+            return new ContainerChronicler(windowID, playerInventory, capabilityItemList, ItemStack.EMPTY);
         }
         return null;
     }
@@ -140,17 +141,26 @@ public class ContainerChronicier extends Container {
         return false;
     }
 
+    public CapabilityItemList getCapabilityItemList() {
+        if (cap_list!=null) {
+            return cap_list;
+            }
+        return new CapabilityItemList();
+    }
+
+    public void setCapabilityItemList(CapabilityItemList cap_list){
+        this.cap_list = cap_list;
+    }
+
+    public ItemStack getItemStackChronicler() {
+        return itemStack;
+    }
+
 
     @Override
     public void broadcastChanges() {
-        if (cap_list!=null && cap_list.isDirty()) {
-//            CompoundNBT nbt = itemStack.getOrCreateTag();
-//            int dirtyCounter = nbt.getInt("dirtyCounter");
-//            nbt.putInt("dirtyCounter", dirtyCounter + 1);
-//            itemStack.setTag(nbt);
-
-            cap_list.setDirty(false);
-        }
+        allItemMap = cap_list.getAllMap();
+        loadSlots();
         super.broadcastChanges();
     }
 }

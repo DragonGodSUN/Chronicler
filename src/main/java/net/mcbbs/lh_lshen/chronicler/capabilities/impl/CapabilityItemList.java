@@ -46,7 +46,9 @@ public class CapabilityItemList implements ICapabilityItemList {
         ItemStack stack = ItemStack.EMPTY;
         if (itemAllMap.containsKey(item_id)) {
             List<ItemStack> itemStackList = itemAllMap.get(item_id);
-            stack = itemStackList.get(index);
+            if (index < itemStackList.size()) {
+                stack = itemStackList.get(index);
+            }
         }
         return stack;
     }
@@ -80,12 +82,14 @@ public class CapabilityItemList implements ICapabilityItemList {
         List<ItemStack> itemList = getItemList(itemStack.getItem().getRegistryName().toString());
         ItemStack itemStack1 = itemStack.copy();
         itemStack1.setCount(1);
-        if (itemList != null){
-            itemList.set(index,itemStack1);
-        }else {
-            List<ItemStack> itemList_new = Lists.newArrayList();
-            itemList_new.set(index,itemStack1);
-            itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
+        if (index < itemList.size()) {
+            if (itemList != null){
+                itemList.set(index,itemStack1);
+            }else {
+                List<ItemStack> itemList_new = Lists.newArrayList();
+                itemList_new.add(itemStack1);
+                itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
+            }
         }
     }
 
@@ -93,7 +97,7 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public void delItemStack(String item_id, int index) {
         List<ItemStack> itemStackList = getItemList(item_id);
-        if (itemStackList != null){
+        if (itemStackList != null && index <itemStackList.size()){
             itemStackList.remove(index);
         }
     }
