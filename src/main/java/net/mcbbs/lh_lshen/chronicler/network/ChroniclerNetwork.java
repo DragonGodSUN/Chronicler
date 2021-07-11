@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.network;
 
 import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.network.packages.BasicMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.ProduceMessage;
 import net.mcbbs.lh_lshen.chronicler.network.packages.SynCapMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -38,6 +39,8 @@ public class ChroniclerNetwork {
         INSTANCE.registerMessage(nextID(), BasicMessage.class, BasicMessage::encode, BasicMessage::decode, BasicMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), SynCapMessage.class, SynCapMessage::encode, SynCapMessage::decode, SynCapMessage::handler,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        INSTANCE.registerMessage(nextID(), ProduceMessage.class, ProduceMessage::encode, ProduceMessage::decode, ProduceMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
 //        INSTANCE.registerMessage(nextID(), SynCapMessage.class, SynCapMessage::encode, SynCapMessage::decode, SynCapMessage::handler,
 //                Optional.of(NetworkDirection.PLAY_TO_CLIENT));

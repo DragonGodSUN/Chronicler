@@ -126,7 +126,8 @@ public class StoreHelper {
         if (allItemMap.containsKey(item_id)) {
             itemStackList = allItemMap.get(item_id);
         }
-        Inventory inventory = new Inventory(8);
+        int size = (int) (1 + itemStackList.size()/4)*4;
+        Inventory inventory = new Inventory(size);
         for (ItemStack stack:itemStackList) {
             if (stack.getItem().getRegistryName().toString().equals(item_id)) {
                 inventory.addItem(stack);

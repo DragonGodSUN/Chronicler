@@ -27,8 +27,11 @@ public class ContainerChronicler extends Container {
     private Map<String, List<ItemStack>> allItemMap;
     private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
-    public SelectCompnent selectCompnent = new SelectCompnent();
+    public SelectCompnent selectCompnent;
     public boolean selectBoxOpen;
+
+    public final int CAP_SIZE = 31;
+
     protected ContainerChronicler(int windowId, PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
                                   ItemStack itemStack) {
@@ -36,10 +39,8 @@ public class ContainerChronicler extends Container {
         this.cap_list = cap_list;
         this.itemStack = itemStack;
         this.allItemMap = cap_list.getAllMap();
-        if (itemStack.getItem() instanceof ItemChronicler) {
-            this.selectCompnent = ((ItemChronicler) itemStack.getItem()).getSelectCompnent(itemStack);
-        }
         this.inventory_player = playerInv;
+        initSelectCompnent();
         loadSlots();
     }
 
@@ -47,6 +48,7 @@ public class ContainerChronicler extends Container {
         this.slots.clear();
         loadInventories();
         addCapabilitySlots();
+        addSelectedSlot();
     }
 
     private void loadInventories(){
@@ -60,6 +62,15 @@ public class ContainerChronicler extends Container {
         this.inventories = inventories_new;
     }
 
+    private void initSelectCompnent(){
+        List<Integer> stack_list = Lists.newArrayList();
+        for (int i=0;i<8;i++){
+            stack_list.add(0);
+        }
+        this.selectCompnent = new SelectCompnent(this,0, stack_list,cap_list);
+
+    }
+
     private void addCapabilitySlots(){
         final int SLOT_X_SPACING = 18;
         final int SLOT_Y_SPACING = 18;
@@ -69,29 +80,46 @@ public class ContainerChronicler extends Container {
         List<String> keys = Lists.newArrayList();
         keys.addAll(allItemMap.keySet());
         for (int j =0;j<8;j++) {
-            if (j<keys.size()) {
-                Inventory inventory = inventories.get( j );
+
+            if (j<keys.size() && inventories.size() > page*8+j) {
+                Inventory inventory = inventories.get( page*8+j );
+                int stack_page = selectCompnent.stackList.get(j);
+
                 for (int i = 0; i<4; i++){
-                    addSlot(new SlotChronicler(inventory,i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j));
+                    if (inventory.getContainerSize() >stack_page*4 + i) {
+                        addSlot(new SlotChronicler(inventory,stack_page*4 + i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j,
+                               i,j));
+                    }
                 }
+
             }
         }
+
+    }
+
+    public void addSelectedSlot(){
+        ItemStack selectItem = selectCompnent.selectItemStack;
+        Inventory inventory = new Inventory(1);
+        if (selectItem != null && !selectItem.isEmpty() && selectBoxOpen){
+            inventory.addItem(selectItem);
+        }
+        addSlot(new SlotChronicler(inventory,0,119, 82,0,0));
     }
 
 
     @Override
     public ItemStack clicked(int slot, int player_slot, ClickType clickType, PlayerEntity playerEntity) {
-        if (clickType == ClickType.PICKUP) {
+        if (clickType == ClickType.PICKUP && playerEntity.level.isClientSide) {
             ItemStack itemStackSelect = this.slots.get(slot).getItem();
-            if (!itemStackSelect.isEmpty() && playerEntity !=null){
+            if (!itemStackSelect.isEmpty()){
                selectCompnent.selectSlot(slot);
                this.selectBoxOpen = true;
-//                ((ItemChronicler) itemStack.getItem()).setSelectCompnent(itemStack,selectCompnent);
+            }else {
+                selectBoxOpen = false;
             }
-        }else {
-            this.selectBoxOpen =false;
+            loadSlots();
         }
-        return super.clicked(slot,player_slot,clickType,playerEntity);
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -115,11 +143,8 @@ public class ContainerChronicler extends Container {
         CapabilityItemList capabilityItemList = new CapabilityItemList();
         if (stack.getItem() instanceof ItemChronicler){
         try {
-//            capabilityItemList = ((ItemChronicler)stack.getItem()).getItemListCapability(stack);
             capabilityItemList.deserializeNBT(listNBT);
             if (capabilityItemList!=null) {
-                System.out.println("tag-list:"+listNBT);
-                System.out.println("tag-map:"+capabilityItemList.getAllMap());
                 return new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
             }
             } catch (IllegalArgumentException iae) {
@@ -159,8 +184,11 @@ public class ContainerChronicler extends Container {
 
     @Override
     public void broadcastChanges() {
-        allItemMap = cap_list.getAllMap();
-        loadSlots();
+        if (cap_list.isDirty()) {
+            allItemMap = cap_list.getAllMap();
+            loadSlots();
+            cap_list.setDirty(false);
+        }
         super.broadcastChanges();
     }
 }

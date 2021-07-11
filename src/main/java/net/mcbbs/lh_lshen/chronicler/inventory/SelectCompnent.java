@@ -3,30 +3,35 @@ package net.mcbbs.lh_lshen.chronicler.inventory;
 import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Slot;
+import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotChronicler;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
 
 public class SelectCompnent {
     public int page;
-    public List<Integer> stack_list = Lists.newArrayList();;
+    public List<Integer> stackList = Lists.newArrayList();;
     public int selectSlot;
     public ItemStack selectItemStack = ItemStack.EMPTY;
-    private ICapabilityItemList cap_list = new CapabilityItemList();
+    private ICapabilityItemList capList = new CapabilityItemList();
+    private ContainerChronicler container;
 
     public SelectCompnent() {
     }
 
-    public SelectCompnent(int page, List<Integer> stack_list, ICapabilityItemList cap_list) {
+    public SelectCompnent(ContainerChronicler container, int page, List<Integer> stack_list, ICapabilityItemList cap_list) {
+        this.container = container;
         this.page = page;
-        this.stack_list = stack_list;
-        this.cap_list = cap_list;
+        this.stackList = stack_list;
+        this.capList = cap_list;
     }
 
     public void selectSlot(int slot){
         this.selectSlot = slot;
+        if(slot < container.slots.size()){
+            SlotChronicler slotChronicler = (SlotChronicler) container.slots.get(slot);
+            setSelectItemStack(slotChronicler.getItem());
+        }
     }
 
     public void setSelectItemStack(ItemStack selectItemStack) {
@@ -38,7 +43,7 @@ public class SelectCompnent {
     }
 
     public void setCapability(ICapabilityItemList cap_list) {
-        this.cap_list = cap_list;
+        this.capList = cap_list;
     }
 
     public int getSelectSlot(){
@@ -46,12 +51,33 @@ public class SelectCompnent {
     }
 
     public void pageReset(){
-        for (Integer i : stack_list){
+        for (Integer i : stackList){
             i = 0;
         }
     }
 
     public int getPage() {
         return page;
+    }
+
+    public void setStackList(List<Integer> stackList) {
+        this.stackList = stackList;
+    }
+
+    public void setStackListPage(int row, int page){
+        List<Integer> list = this.stackList;
+        if (row<list.size()) {
+            list.set(row,page);
+            this.setStackList(list);
+        }
+    }
+
+    public void changeStackListPage(int row, int change){
+        List<Integer> list = this.stackList;
+        if (row<list.size()) {
+            int list_page = list.get(row);
+            list.set(row,list_page+change);
+            this.setStackList(list);
+        }
     }
 }
