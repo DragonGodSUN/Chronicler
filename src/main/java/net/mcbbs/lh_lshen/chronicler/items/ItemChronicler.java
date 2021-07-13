@@ -20,6 +20,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -41,28 +42,25 @@ public class ItemChronicler extends Item {
         capability.ifPresent((cap_list)->{
             if (entity.isShiftKeyDown()) {
                 StoreHelper.addItemStack(cap_list,itemStack_l);
-                if (world.isClientSide) {
-                    System.out.println("Store:"+itemStack_l.getDisplayName());
-                }
             }else {
-                if (!world.isClientSide && itemStack.getItem() instanceof ItemChronicler) {
-//                    CompoundNBT nbt = getShareTagSnapShot(itemStack);
-//                    readShareTagSnapShot(itemStack,nbt);
-                    INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, itemStack);
-                    NetworkHooks.openGui((ServerPlayerEntity) entity,
-                            containerProvider,
-                            (packetBuffer)->{
-                                ListNBT listNBT = getListNBT(itemStack);
-                                packetBuffer.writeItemStack(itemStack,true);
-                                packetBuffer.writeInt(listNBT.size());
-//                                System.out.println(listNBT);
-                                for (int i=0;i<listNBT.size();i++){
-                                    CompoundNBT nbt = listNBT.getCompound(i);
-                                    if (nbt !=null) {
-                                        packetBuffer.writeNbt(nbt);
+                if (itemStack.getItem() instanceof ItemChronicler) {
+                    if (!world.isClientSide ) {
+                        INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, itemStack);
+                        NetworkHooks.openGui((ServerPlayerEntity) entity,
+                                containerProvider,
+                                (packetBuffer)->{
+                                    ListNBT listNBT = getListNBT(itemStack);
+                                    packetBuffer.writeItemStack(itemStack,true);
+                                    packetBuffer.writeInt(listNBT.size());
+                                    for (int i=0;i<listNBT.size();i++){
+                                        CompoundNBT nbt = listNBT.getCompound(i);
+                                        if (nbt !=null) {
+                                            packetBuffer.writeNbt(nbt);
+                                        }
                                     }
-                                }
-                            });
+                                });
+                    }
+                    entity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
                 }
             }
         });

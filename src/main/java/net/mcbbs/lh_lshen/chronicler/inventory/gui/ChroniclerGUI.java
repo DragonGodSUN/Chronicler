@@ -137,7 +137,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         ImageButton indexUp = new ImageButton(leftPos + 63, topPos + 139, 6, 10, 133, 3, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
-                            selectCompnent.selectSlot < this.menu.CAP_MAX_SLOT && this.menu.selectBoxOpen) {
+                            selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
                         CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
                         ItemStack chronicler = this.menu.getItemStackChronicler();
@@ -170,7 +170,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         ImageButton indexDown = new ImageButton(leftPos + 69, topPos + 139, 6, 10, 161, 3, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
-                            selectCompnent.selectSlot < this.menu.CAP_MAX_SLOT && this.menu.selectBoxOpen) {
+                            selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
                         CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
                         ItemStack chronicler = this.menu.getItemStackChronicler();
@@ -199,7 +199,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         ImageButton indexFirst = new ImageButton(leftPos + 61, topPos + 114, 16, 16, 110, 0, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
-                            selectCompnent.selectSlot < this.menu.CAP_MAX_SLOT && this.menu.selectBoxOpen) {
+                            selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
                         CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
                         ItemStack chronicler = this.menu.getItemStackChronicler();
@@ -220,11 +220,11 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
 
         ImageButton listUp = new ImageButton(leftPos + 42, topPos + 138, 10, 6, 134, 50, 24, BUTTON, 256, 256,
                 (button) -> {
+                    CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                    ItemStack chronicler = this.menu.getItemStackChronicler();
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
-                            selectCompnent.selectSlot < this.menu.CAP_MAX_SLOT && this.menu.selectBoxOpen) {
-                        CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                            selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
-                        ItemStack chronicler = this.menu.getItemStackChronicler();
                         if (cap_list != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
                             ItemStack itemStack = selectSlot.getItem();
                             boolean hasItem = StoreHelper.hasItemStack(cap_list, itemStack);
@@ -236,7 +236,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                     selectCompnent.selectSlot -= 4;
                                 } else if (selectCompnent.page >0){
                                     selectCompnent.prePage();
-                                    selectCompnent.selectSlot = this.menu.CAP_MAX_SLOT - 3;
+                                    selectCompnent.selectSlot = this.menu.CAP_SIZE - 3 -1;
                                 }else {
                                     selectCompnent.selectSlot = 0;
                                 }
@@ -244,16 +244,34 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                             }
                         }
                     }
+                    if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotStar
+                            && selectCompnent.selectSlot < this.menu.STAR_SIZE && this.menu.selectBoxOpen){
+                        Inventory inventory = cap_list.getInventoryStar();
+                        SlotStar slotStar = (SlotStar) this.menu.slots.get(selectCompnent.getSelectSlot());
+                        ItemStack stack = this.menu.selectCompnent.selectItemStack;
+                        if (inventory !=null && !inventory.isEmpty() &&!stack.isEmpty()){
+                            if (slotStar.getSlotIndex()>0){
+                                ItemStack replace = inventory.getItem(slotStar.getSlotIndex()-1);
+                                inventory.setItem(slotStar.getSlotIndex()-1,stack);
+                                inventory.setItem(slotStar.getSlotIndex(),replace);
+                                cap_list.setInventoryStar(inventory);
+
+                                selectCompnent.selectSlot -=1;
+                                synData(chronicler,cap_list);
+                            }
+                        }
+                    }
+
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("序列上升"), x, y), StringTextComponent.EMPTY);
 
         ImageButton listDown = new ImageButton(leftPos + 42, topPos + 144, 10, 6, 156, 56, 24, BUTTON, 256, 256,
                 (button) -> {
+                    CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                    ItemStack chronicler = this.menu.getItemStackChronicler();
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
-                            selectCompnent.selectSlot < this.menu.CAP_MAX_SLOT && this.menu.selectBoxOpen) {
-                        CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                            selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
-                        ItemStack chronicler = this.menu.getItemStackChronicler();
                         if (cap_list != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
                             ItemStack itemStack = selectSlot.getItem();
                             boolean hasItem = StoreHelper.hasItemStack(cap_list, itemStack);
@@ -262,7 +280,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                     StoreHelper.downStackListIndex(cap_list,itemStack);
                                     selectCompnent.setStackListPage(selectSlot.getJ_index(),0);
                                     selectCompnent.selectSlot(selectSlot.getJ_index()*4);
-                                        if (selectCompnent.selectSlot + 4 < this.menu.CAP_MAX_SLOT) {
+                                        if (selectCompnent.selectSlot + 4 < this.menu.CAP_SIZE) {
                                             selectCompnent.selectSlot += 4;
                                         } else if (selectCompnent.page < cap_list.getKeyList().size() / 8) {
                                             selectCompnent.nextPage();
@@ -273,6 +291,25 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 }
                                 synData(chronicler, cap_list);
                             }
+                        }
+                    }
+                    if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotStar
+                            && selectCompnent.selectSlot < this.menu.STAR_SIZE && this.menu.selectBoxOpen){
+                        Inventory inventory = cap_list.getInventoryStar();
+                        SlotStar slotStar = (SlotStar) this.menu.slots.get(selectCompnent.getSelectSlot());
+                        ItemStack stack = this.menu.selectCompnent.selectItemStack;
+                        if (inventory !=null && !inventory.isEmpty() &&!stack.isEmpty()){
+                            if (slotStar.getSlotIndex()+1<inventory.getContainerSize()) {
+                                ItemStack replace = inventory.getItem(slotStar.getSlotIndex()+1);
+                                inventory.setItem(slotStar.getSlotIndex()+1,stack);
+                                inventory.setItem(slotStar.getSlotIndex(),replace);
+                                cap_list.setInventoryStar(inventory);
+                            }
+                            if (selectCompnent.selectSlot+1 < this.menu.STAR_SIZE){
+                                selectCompnent.selectSlot +=1;
+                            }
+                            synData(chronicler,cap_list);
+
                         }
                     }
                 },
@@ -287,7 +324,6 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     if (selectItem != null && this.menu.selectBoxOpen) {
                         ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
                     }
-                    synData(chronicler,cap_list);
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("生成"), x, y), StringTextComponent.EMPTY);
 
@@ -391,17 +427,19 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
             star.setStateTriggered(false);
         }
 
-        if (this.menu.selectBoxOpen && slot<this.menu.CAP_MAX_SLOT) {
+        if (this.menu.selectBoxOpen && slot<this.menu.CAP_SIZE) {
             getMinecraft().textureManager.bind(LOADING);
             blit(matrixStack,leftPos+LIST_XPOS + SLOT_X_SPACING*x,topPos+LIST_YPOS + SLOT_Y_SPACING*y,28,0,20,20);
         }
 
-        if (this.menu.selectBoxOpen && slot>=this.menu.CAP_MAX_SLOT && slot<this.menu.STAR_MAX_SLOT) {
+        if (this.menu.selectBoxOpen && slot>=this.menu.CAP_SIZE && slot<this.menu.STAR_SIZE) {
             if (this.menu.slots.get(slot) instanceof SlotStar) {
                 SlotStar slotStar = (SlotStar) this.menu.slots.get(slot);
+                getMinecraft().textureManager.bind(LOADING);
+                blit(matrixStack,leftPos+26,topPos+20 + SLOT_Y_SPACING*slotStar.getSlotIndex(),50,0,8,11);
+
                 if (selectCompnent.page==slotStar.getLinkedPage() &&
                 selectCompnent.stackList.get(slotStar.getLinkedRow())==slotStar.getLinkedStackPage()) {
-                    getMinecraft().textureManager.bind(LOADING);
                     blit(matrixStack,leftPos+LIST_XPOS+SLOT_X_SPACING*(slotStar.getLinkedStackIndex()),topPos+LIST_YPOS + SLOT_Y_SPACING*slotStar.getLinkedRow(),28,0,20,20);
                 }
             }
@@ -414,6 +452,5 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         capabilityItemList.markDirty();
         this.menu.setCapabilityItemList(capabilityItemList);
         this.menu.broadcastChanges();
-        StoreHelper.synCapabilityToSever(chronicler,capabilityItemList);
     }
 }

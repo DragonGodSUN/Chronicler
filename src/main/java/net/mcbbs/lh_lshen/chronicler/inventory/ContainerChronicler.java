@@ -31,8 +31,8 @@ public class ContainerChronicler extends Container {
     public SelectCompnent selectCompnent;
     public boolean selectBoxOpen;
 
-    public final int CAP_MAX_SLOT = 31;
-    public final int STAR_MAX_SLOT = 39;
+    public final int CAP_SIZE = 32;
+    public final int STAR_SIZE = 40;
     public boolean starTriggered;
 
     protected ContainerChronicler(int windowId, PlayerInventory playerInv,
@@ -105,8 +105,8 @@ public class ContainerChronicler extends Container {
     }
 
     public void addStarSlots(){
-        final int LIST_XPOS = 9;
-        final int LIST_YPOS = 18;
+        final int LIST_XPOS = 10;
+        final int LIST_YPOS = 16;
         final int Y_SPACING = 18;
         for (int j =0;j<8;j++){
             Inventory inventoryStar = cap_list.getInventoryStar();
@@ -206,8 +206,8 @@ public class ContainerChronicler extends Container {
     @Override
     public void broadcastChanges() {
         if (cap_list.isDirty()) {
-            loadInventories();
             loadSlots();
+            StoreHelper.synCapabilityToSever(this.itemStack,this.cap_list);
             cap_list.setDirty(false);
         }
         super.broadcastChanges();

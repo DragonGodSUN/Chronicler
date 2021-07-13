@@ -30,7 +30,11 @@ public class ProduceMessage extends BasicMessage {
                 }
                 ItemStack itemStack = message.itemStack;
                 if (itemStack != null) {
-                    sender.inventory.add(itemStack);
+                    if (sender.inventory.getFreeSlot()!=-1) {
+                        sender.inventory.add(itemStack.copy());
+                    }else {
+                        sender.drop(itemStack.copy(),true);
+                    }
                 }
             });
         }
