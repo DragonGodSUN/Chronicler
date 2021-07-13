@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.helper;
 
 import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.SynCapMessage;
 import net.minecraft.inventory.Inventory;
@@ -92,6 +93,41 @@ public class StoreHelper {
         }
     }
 
+    public static void upStackListIndex(ICapabilityItemList capabilityItemList,ItemStack itemStack){
+        if (!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
+            String item_reg_id = itemStack.getItem().getRegistryName().toString();
+            int index_select = capabilityItemList.getKeyList().indexOf(item_reg_id);
+            if(index_select>0){
+                String item_reg_id_replace = capabilityItemList.getKeyList().get(index_select-1);
+                capabilityItemList.setKeyIndex(item_reg_id,index_select-1);
+                capabilityItemList.setKeyIndex(item_reg_id_replace,index_select);
+            }
+        }
+    }
+
+    public static void downStackListIndex(ICapabilityItemList capabilityItemList,ItemStack itemStack){
+        if (!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
+            List<String> keys = capabilityItemList.getKeyList();
+            String item_reg_id = itemStack.getItem().getRegistryName().toString();
+            int index_select = keys.indexOf(item_reg_id);
+            if(index_select+1<keys.size()){
+                String item_reg_id_replace = capabilityItemList.getKeyList().get(index_select+1);
+                capabilityItemList.setKeyIndex(item_reg_id,index_select+1);
+                capabilityItemList.setKeyIndex(item_reg_id_replace,index_select);
+            }
+        }
+    }
+
+    public static int getStackListIndex(ICapabilityItemList capabilityItemList,ItemStack itemStack){
+        if (!itemStack.isEmpty() && hasItemStack(capabilityItemList,itemStack)){
+            List<String> keys = capabilityItemList.getKeyList();
+            String item_reg_id = itemStack.getItem().getRegistryName().toString();
+            int index_select = keys.indexOf(item_reg_id);
+            return index_select;
+        }
+        return 0;
+    }
+
     public static void addItemStack(ICapabilityItemList capabilityItemList, ItemStack itemStack){
         if (!itemStack.isEmpty()) {
             capabilityItemList.addItemStack(itemStack);
@@ -103,6 +139,15 @@ public class StoreHelper {
             int index = getStackIndex(capabilityItemList,itemStack);
             capabilityItemList.delItemStack(itemStack.getItem().getRegistryName().toString(),index);
         }
+    }
+
+    public static int getPage(ICapabilityItemList capabilityItemList, ItemStack itemStack){
+        if (hasItemStack(capabilityItemList,itemStack)){
+            int listIndex = getStackListIndex(capabilityItemList,itemStack);
+            int page = listIndex / 8;
+            return page;
+        }
+        return 0;
     }
 
     public static Inventory getAllInventory(Map<String, List<ItemStack>> allItemMap){
@@ -134,6 +179,19 @@ public class StoreHelper {
             }
         }
         return inventory;
+    }
+
+    public static boolean isItemStar(CapabilityItemList capabilityItemList, ItemStack itemStack){
+        Inventory inventory = capabilityItemList.getInventoryStar();
+        boolean flag =false;
+        for (int i=0;i<inventory.getContainerSize();i++){
+            ItemStack stack = inventory.getItem(i);
+            if (stack.equals(itemStack,false)){
+                flag =true;
+                break;
+            }
+        }
+        return flag;
     }
 
     public static void synCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){

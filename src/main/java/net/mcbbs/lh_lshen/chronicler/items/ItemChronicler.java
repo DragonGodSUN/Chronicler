@@ -55,7 +55,7 @@ public class ItemChronicler extends Item {
                                 ListNBT listNBT = getListNBT(itemStack);
                                 packetBuffer.writeItemStack(itemStack,true);
                                 packetBuffer.writeInt(listNBT.size());
-                                System.out.println(listNBT);
+//                                System.out.println(listNBT);
                                 for (int i=0;i<listNBT.size();i++){
                                     CompoundNBT nbt = listNBT.getCompound(i);
                                     if (nbt !=null) {
@@ -90,39 +90,39 @@ public class ItemChronicler extends Item {
         return (CapabilityItemList) cap_list;
     }
 
-    public SelectCompnent getSelectCompnent(ContainerChronicler container, ItemStack stack) {
-        CompoundNBT nbt = stack.getShareTag();
-        SelectCompnent selectCompnent = new SelectCompnent();
-        if (nbt != null) {
-            int page = nbt.getInt("page");
-            int slot = nbt.getInt("slot_select");
-            int slot_size = nbt.getInt("slot_size");
-            List<Integer> stack_list = Lists.newArrayList();
-            for (int i=0;i<slot_size;i++) {
-                int stack_unit = nbt.getInt("stack_list:"+i);
-                stack_list.add(stack_unit);
-            }
-        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-            if (capabilityItemList!=null){
-                selectCompnent = new SelectCompnent(container,page,stack_list,capabilityItemList);
-                selectCompnent.selectSlot(slot);
-            }
-        }
-        return selectCompnent;
-    }
-
-    public void setSelectCompnent(ItemStack stack, SelectCompnent selectCompnent) {
-        CompoundNBT nbt = stack.getShareTag();
-        if (nbt !=null && selectCompnent != null) {
-            nbt.putInt("page",selectCompnent.page);
-            nbt.putInt("slot_select",selectCompnent.selectSlot);
-            nbt.putInt("stack_size",selectCompnent.stackList.size());
-            for (int i = 0; i<selectCompnent.stackList.size(); i++) {
-                nbt.putInt("stack_list:"+i,selectCompnent.stackList.get(i));
-            }
-        }
-
-    }
+//    public SelectCompnent getSelectCompnent(ContainerChronicler container, ItemStack stack) {
+//        CompoundNBT nbt = stack.getShareTag();
+//        SelectCompnent selectCompnent = new SelectCompnent();
+//        if (nbt != null) {
+//            int page = nbt.getInt("page");
+//            int slot = nbt.getInt("slot_select");
+//            int slot_size = nbt.getInt("slot_size");
+//            List<Integer> stack_list = Lists.newArrayList();
+//            for (int i=0;i<slot_size;i++) {
+//                int stack_unit = nbt.getInt("stack_list:"+i);
+//                stack_list.add(stack_unit);
+//            }
+//        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
+//            if (capabilityItemList!=null){
+//                selectCompnent = new SelectCompnent(container,page,stack_list,capabilityItemList);
+//                selectCompnent.selectSlot(slot);
+//            }
+//        }
+//        return selectCompnent;
+//    }
+//
+//    public void setSelectCompnent(ItemStack stack, SelectCompnent selectCompnent) {
+//        CompoundNBT nbt = stack.getShareTag();
+//        if (nbt !=null && selectCompnent != null) {
+//            nbt.putInt("page",selectCompnent.page);
+//            nbt.putInt("slot_select",selectCompnent.selectSlot);
+//            nbt.putInt("stack_size",selectCompnent.stackList.size());
+//            for (int i = 0; i<selectCompnent.stackList.size(); i++) {
+//                nbt.putInt("stack_list:"+i,selectCompnent.stackList.get(i));
+//            }
+//        }
+//
+//    }
 
     @Nullable
     @Override

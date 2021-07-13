@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.events;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import javafx.util.Pair;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
@@ -44,50 +45,13 @@ public class CommonEventHandler {
                         @Nullable
                         @Override
                         public INBT writeNBT(Capability<ICapabilityItemList> capability, ICapabilityItemList instance, Direction side) {
-                            ListNBT nbtTagList = new ListNBT();
-                            for(Map.Entry<String, List<ItemStack>> entry:instance.getAllMap().entrySet()){
-                                for (ItemStack itemStack:entry.getValue()){
-                                    CompoundNBT itemTag = new CompoundNBT();
-                                    itemTag.putString("item_id",entry.getKey());
-//                                    itemTag.putInt("stack_index",entry.getValue().indexOf(itemStack));
-                                    itemStack.save(itemTag);
-                                    nbtTagList.add(itemTag);
-                                }
-                            }
-                            return nbtTagList;
+                            return instance.serializeNBT();
                         }
 
                         @Override
                         public void readNBT(Capability<ICapabilityItemList> capability, ICapabilityItemList instance, Direction side, INBT nbt) {
                             if(instance instanceof CapabilityItemList && nbt instanceof ListNBT){
-                                ListNBT nbtList = (ListNBT) nbt;
-                                Map<String, List<ItemStack>> itemAllMap_nbt = Maps.newHashMap();
-                                List<ItemStack> stackList_nbt = Lists.newArrayList();
-                                List<String> id_list = Lists.newArrayList();
-                                for (INBT tag:nbtList){
-                                    if (tag instanceof CompoundNBT){
-                                        CompoundNBT itemNbt = (CompoundNBT) tag;
-                                        String id = itemNbt.getString("item_id");
-//                                        int index = itemNbt.getInt("stack_index");
-                                        ItemStack stack = ItemStack.of(itemNbt);
-                                        id_list.add(id);
-                                        stackList_nbt.add(stack);
-//                                        stackList_nbt.set(index,stack);
-                                    }
-                                }
-                                if (!stackList_nbt.isEmpty()) {
-                                    for (String id : id_list) {
-                                        List<ItemStack> stackList = Lists.newArrayList();
-                                        for (ItemStack stack : stackList_nbt) {
-                                            String stack_id = stack.getItem().getRegistryName().toString();
-                                            if (id.equals(stack_id)){
-                                                stackList.add(stack);
-                                            }
-                                        }
-                                        itemAllMap_nbt.put(id,stackList);
-                                    }
-                                }
-                                instance.setAllMap(itemAllMap_nbt);
+                                instance.deserializeNBT((ListNBT) nbt);
                             }
                         }
                     },CapabilityItemList::new);

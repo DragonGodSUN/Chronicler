@@ -33,4 +33,8 @@ public class SlotChronicler extends Slot {
         return false;
     }
 
+    @Override
+    public int getMaxStackSize() {
+        return 1;
+    }
 }

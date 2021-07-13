@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotChronicler;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class SelectCompnent {
     public void selectSlot(int slot){
         this.selectSlot = slot;
         if(slot < container.slots.size()){
-            SlotChronicler slotChronicler = (SlotChronicler) container.slots.get(slot);
+            Slot slotChronicler = container.slots.get(slot);
             setSelectItemStack(slotChronicler.getItem());
         }
     }
@@ -54,6 +55,22 @@ public class SelectCompnent {
         for (Integer i : stackList){
             i = 0;
         }
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public void nextPage(){
+        int page = this.page;
+        setPage(page+1);
+        pageReset();
+    }
+
+    public void prePage(){
+        int page = this.page;
+        setPage(page-1);
+        pageReset();
     }
 
     public int getPage() {

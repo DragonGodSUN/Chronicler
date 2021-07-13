@@ -70,8 +70,10 @@ public class SynCapMessage {
                 if (itemHold.getItem() instanceof ItemChronicler) {
                     LazyOptional<ICapabilityItemList> cap_item = itemHold.getCapability(ModCapability.ITEMLIST_CAPABILITY);
                     cap_item.ifPresent((c) -> {
-                        if (cap != null && !cap.getAllMap().isEmpty()) {
+                        if (cap != null && !cap.getKeyList().isEmpty() && !cap.getAllMap().isEmpty()) {
                             c.setAllMap(cap.getAllMap());
+                            c.setKeyList(cap.getKeyList());
+                            c.setInventoryStar(cap.getInventoryStar());
                         }
                     });
                 }

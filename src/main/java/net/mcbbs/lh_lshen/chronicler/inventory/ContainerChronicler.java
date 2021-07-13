@@ -5,6 +5,7 @@ import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotChronicler;
+import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotStar;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,13 +25,15 @@ public class ContainerChronicler extends Container {
 
     private CapabilityItemList cap_list;
     private ItemStack itemStack;
-    private Map<String, List<ItemStack>> allItemMap;
+//    private Map<String, List<ItemStack>> allItemMap;
     private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
     public SelectCompnent selectCompnent;
     public boolean selectBoxOpen;
 
-    public final int CAP_SIZE = 31;
+    public final int CAP_MAX_SLOT = 31;
+    public final int STAR_MAX_SLOT = 39;
+    public boolean starTriggered;
 
     protected ContainerChronicler(int windowId, PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
@@ -38,7 +41,7 @@ public class ContainerChronicler extends Container {
         super(CommonEventHandler.containerTypeChronicler, windowId);
         this.cap_list = cap_list;
         this.itemStack = itemStack;
-        this.allItemMap = cap_list.getAllMap();
+//        this.allItemMap = cap_list.getAllMap();
         this.inventory_player = playerInv;
         initSelectCompnent();
         loadSlots();
@@ -48,15 +51,15 @@ public class ContainerChronicler extends Container {
         this.slots.clear();
         loadInventories();
         addCapabilitySlots();
+        addStarSlots();
         addSelectedSlot();
     }
 
     private void loadInventories(){
-        List<String> keys = Lists.newArrayList();
+        List<String> keys = cap_list.getKeyList();
         List<Inventory> inventories_new = Lists.newArrayList();
-        keys.addAll(allItemMap.keySet());
         for (int i =0;i<keys.size();i++) {
-            Inventory inventory = StoreHelper.getSingerInventory(allItemMap,keys.get(i));
+            Inventory inventory = StoreHelper.getSingerInventory(cap_list.getAllMap(),keys.get(i));
             inventories_new.add(inventory);
         }
         this.inventories = inventories_new;
@@ -77,24 +80,38 @@ public class ContainerChronicler extends Container {
         final int LIST_XPOS = 152;
         final int LIST_YPOS = 18;
         int page = selectCompnent.getPage();
-        List<String> keys = Lists.newArrayList();
-        keys.addAll(allItemMap.keySet());
+        List<String> keys = cap_list.getKeyList();
         for (int j =0;j<8;j++) {
 
             if (j<keys.size() && inventories.size() > page*8+j) {
                 Inventory inventory = inventories.get( page*8+j );
                 int stack_page = selectCompnent.stackList.get(j);
-
                 for (int i = 0; i<4; i++){
                     if (inventory.getContainerSize() >stack_page*4 + i) {
                         addSlot(new SlotChronicler(inventory,stack_page*4 + i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j,
                                i,j));
                     }
                 }
-
+            }else {
+                Inventory inventory = new Inventory(4);
+                for (int i = 0; i<4; i++){
+                    addSlot(new SlotChronicler(inventory,i,LIST_XPOS + SLOT_X_SPACING * i, LIST_YPOS + SLOT_Y_SPACING * j,
+                            i,j));
+                }
             }
+
         }
 
+    }
+
+    public void addStarSlots(){
+        final int LIST_XPOS = 9;
+        final int LIST_YPOS = 18;
+        final int Y_SPACING = 18;
+        for (int j =0;j<8;j++){
+            Inventory inventoryStar = cap_list.getInventoryStar();
+            addSlot(new SlotStar(inventoryStar,j,LIST_XPOS,LIST_YPOS+Y_SPACING*j,cap_list));
+        }
     }
 
     public void addSelectedSlot(){
@@ -114,6 +131,9 @@ public class ContainerChronicler extends Container {
             if (!itemStackSelect.isEmpty()){
                selectCompnent.selectSlot(slot);
                this.selectBoxOpen = true;
+
+               this.starTriggered = StoreHelper.isItemStar(cap_list,itemStackSelect);
+
             }else {
                 selectBoxOpen = false;
             }
@@ -145,7 +165,8 @@ public class ContainerChronicler extends Container {
         try {
             capabilityItemList.deserializeNBT(listNBT);
             if (capabilityItemList!=null) {
-                return new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
+                ContainerChronicler chronicler = new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
+                return chronicler;
             }
             } catch (IllegalArgumentException iae) {
                 Logger.getGlobal().info(iae.toString());
@@ -185,7 +206,7 @@ public class ContainerChronicler extends Container {
     @Override
     public void broadcastChanges() {
         if (cap_list.isDirty()) {
-            allItemMap = cap_list.getAllMap();
+            loadInventories();
             loadSlots();
             cap_list.setDirty(false);
         }
