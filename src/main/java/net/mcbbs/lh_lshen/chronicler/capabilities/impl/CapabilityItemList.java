@@ -34,7 +34,7 @@ public class CapabilityItemList implements ICapabilityItemList {
         if (itemAllMap.containsKey(item_id)) {
             return itemAllMap.get(item_id);
         }
-        return null;
+        return Lists.newArrayList();
     }
 
     @Override
@@ -93,7 +93,7 @@ public class CapabilityItemList implements ICapabilityItemList {
         List<ItemStack> itemList = getItemList(itemStack.getItem().getRegistryName().toString());
         ItemStack itemStack1 = itemStack.copy();
         itemStack1.setCount(1);
-        if (itemList != null){
+        if (itemList != null && !itemList.isEmpty()){
             boolean isUnique = true;
             for (ItemStack i:itemList){
                 if (i.equals(itemStack1,false)) {
@@ -134,6 +134,7 @@ public class CapabilityItemList implements ICapabilityItemList {
         List<ItemStack> itemStackList = getItemList(item_id);
         if (itemStackList != null && index <itemStackList.size()){
             itemStackList.remove(index);
+            itemAllMap.put(item_id,itemStackList);
         }
         if (itemStackList.isEmpty()){
             itemAllMap.remove(item_id);

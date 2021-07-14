@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.SynItemNBTMessage;
@@ -28,27 +29,35 @@ public class ItemRecordPage extends Item {
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack off = player.getOffhandItem();
-        ItemStack main = player.getMainHandItem();
+        ItemStack page = player.getMainHandItem();
         if (player.isShiftKeyDown()){
-            if (!off.isEmpty() && main.getItem() instanceof ItemRecordPage){
-                ItemStack storeItem = getStoreItem(main);
+            if (!off.isEmpty() && page.getItem() instanceof ItemRecordPage){
+                ItemStack storeItem = getStoreItem(page);
                 if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler){
                     if (world.isClientSide) {
                         player.sendMessage(new StringTextComponent("无法记录书页与记录者信息"),UUID.randomUUID());
                     }
-                    return ActionResult.fail(main);
+                    return ActionResult.fail(page);
                 }else if (!storeItem.isEmpty()){
                     if (world.isClientSide) {
                         player.sendMessage(new StringTextComponent("该书页已记录信息"),UUID.randomUUID());
                     }
-                    return ActionResult.fail(main);
+                    return ActionResult.fail(page);
                 }
                 else {
-                    storeItem(main,off);
+//                    storeItem(page,off);
+                    page.shrink(1);
+                    ItemStack storePage = getPageStored(off.copy());
+                    if (player.inventory.canPlaceItem(1,storePage)) {
+                        player.inventory.add(storePage);
+                    }else {
+                        player.drop(storePage,true);
+                    }
+
                     if (world.isClientSide) {
                         player.playSound(SoundEvents.PLAYER_LEVELUP,1f,1f);
                     }
-                    return ActionResult.success(main);
+                    return ActionResult.success(page);
                 }
             }
         }
@@ -79,6 +88,16 @@ public class ItemRecordPage extends Item {
             if (storeItem!=null&&!storeItem.isEmpty()){
                 return storeItem;
             }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public static ItemStack getPageStored(ItemStack stack){
+        if (stack!=null && !stack.isEmpty()) {
+            ItemStack page = new ItemStack(ItemRegistry.recordPage.get());
+            CompoundNBT nbt = NBTHelper.getSafeNBTCompond(page);
+            stack.save(nbt);
+            return page;
         }
         return ItemStack.EMPTY;
     }

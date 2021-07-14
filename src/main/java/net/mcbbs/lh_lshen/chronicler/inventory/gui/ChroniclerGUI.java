@@ -6,6 +6,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
+import net.mcbbs.lh_lshen.chronicler.items.ItemRecordPage;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.ProduceMessage;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -134,7 +135,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
     }
 
     public void addOperationButtons(){
-        ImageButton indexUp = new ImageButton(leftPos + 63, topPos + 139, 6, 10, 133, 3, 24, BUTTON, 256, 256,
+        ImageButton indexUp = new ImageButton(leftPos + 63, topPos + 116, 6, 10, 133, 3, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
                             selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
@@ -167,7 +168,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("排序左移"), x, y), StringTextComponent.EMPTY);
 
-        ImageButton indexDown = new ImageButton(leftPos + 69, topPos + 139, 6, 10, 161, 3, 24, BUTTON, 256, 256,
+        ImageButton indexDown = new ImageButton(leftPos + 69, topPos + 116, 6, 10, 161, 3, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
                             selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
@@ -196,7 +197,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("排序右移"), x, y), StringTextComponent.EMPTY);
 
-        ImageButton indexFirst = new ImageButton(leftPos + 61, topPos + 114, 16, 16, 110, 0, 24, BUTTON, 256, 256,
+        ImageButton indexFirst = new ImageButton(leftPos + 61, topPos + 91, 16, 16, 110, 0, 24, BUTTON, 256, 256,
                 (button) -> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler &&
                             selectCompnent.selectSlot < this.menu.CAP_SIZE && this.menu.selectBoxOpen) {
@@ -218,7 +219,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("设为首位"), x, y), StringTextComponent.EMPTY);
 
-        ImageButton listUp = new ImageButton(leftPos + 42, topPos + 138, 10, 6, 134, 50, 24, BUTTON, 256, 256,
+        ImageButton listUp = new ImageButton(leftPos + 42, topPos + 115, 10, 6, 134, 50, 24, BUTTON, 256, 256,
                 (button) -> {
                     CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                     ItemStack chronicler = this.menu.getItemStackChronicler();
@@ -265,7 +266,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("序列上升"), x, y), StringTextComponent.EMPTY);
 
-        ImageButton listDown = new ImageButton(leftPos + 42, topPos + 144, 10, 6, 156, 56, 24, BUTTON, 256, 256,
+        ImageButton listDown = new ImageButton(leftPos + 42, topPos + 121, 10, 6, 156, 56, 24, BUTTON, 256, 256,
                 (button) -> {
                     CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                     ItemStack chronicler = this.menu.getItemStackChronicler();
@@ -315,6 +316,49 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("序列下降"), x, y), StringTextComponent.EMPTY);
 
+        ImageButton pop = new ImageButton(leftPos + 39, topPos + 134, 16, 16, 189, 0, 24, BUTTON, 256, 256,
+                (button) -> {
+                    if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler
+                        && this.menu.selectBoxOpen) {
+                        CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                        SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
+                        ItemStack chronicler = this.menu.getItemStackChronicler();
+                        if (cap_list != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
+                            ItemStack itemStack = selectSlot.getItem();
+                            boolean hasItem = StoreHelper.hasItemStack(cap_list, itemStack);
+                            if (hasItem) {
+                                cap_list.removeStar(itemStack);
+                                StoreHelper.deleteItemStack(cap_list,itemStack);
+                                ItemStack itemPage = ItemRecordPage.getPageStored(itemStack);
+                                if (this.getMinecraft().player!=null) {
+                                    this.getMinecraft().player.inventory.add(itemPage.copy());
+                                }
+                                ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(itemPage));
+                                this.menu.starTriggered = false;
+                                selectCompnent.setSelectItemStack(ItemStack.EMPTY);
+                                synData(chronicler,cap_list);
+                            }
+                        }
+                    }
+                },
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("弹出"), x, y), StringTextComponent.EMPTY);
+
+        ImageButton reset = new ImageButton(leftPos + 61, topPos + 134, 16, 16, 210, 0, 24, BUTTON, 256, 256,
+                (button) -> {
+                    CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                    ItemStack chronicler = this.menu.getItemStackChronicler();
+                    if (cap_list != null) {
+                        selectCompnent.setPage(0);
+                        selectCompnent.pageReset();
+                        selectCompnent.setSelectItemStack(ItemStack.EMPTY);
+                        this.menu.starTriggered = false;
+                        this.menu.selectBoxOpen = false;
+                        synData(chronicler,cap_list);
+
+                    }
+                },
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("重置"), x, y), StringTextComponent.EMPTY);
+
 
         ImageButton produce = new ImageButton(leftPos + 111, topPos + 158, 34, 15, 49, 0, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -330,7 +374,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("生成"), x, y), StringTextComponent.EMPTY);
 
-        this.star = new ToggleWidget(leftPos + 39, topPos + 114, 16, 16, false);
+        this.star = new ToggleWidget(leftPos + 39, topPos + 91, 16, 16, false);
         star.initTextureValues(0, 48, 18, 24, BUTTON);
 
         this.addButton(indexUp);
@@ -339,6 +383,8 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         this.addButton(listUp);
         this.addButton(listDown);
         this.addButton(star);
+        this.addButton(pop);
+        this.addButton(reset);
         this.addButton(produce);
 
     }
