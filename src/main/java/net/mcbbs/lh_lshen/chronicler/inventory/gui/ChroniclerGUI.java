@@ -322,6 +322,9 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     ItemStack chronicler = this.menu.getItemStackChronicler();
                     ItemStack selectItem = selectCompnent.selectItemStack;
                     if (selectItem != null && this.menu.selectBoxOpen) {
+                        if (this.getMinecraft().player!=null) {
+                            this.getMinecraft().player.inventory.add(selectItem.copy());
+                        }
                         ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
                     }
                 },

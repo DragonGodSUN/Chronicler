@@ -22,12 +22,14 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public class ItemChronicler extends Item {
     public ItemChronicler() {
@@ -41,7 +43,18 @@ public class ItemChronicler extends Item {
         LazyOptional<ICapabilityItemList> capability = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY);
         capability.ifPresent((cap_list)->{
             if (entity.isShiftKeyDown()) {
-                StoreHelper.addItemStack(cap_list,itemStack_l);
+//                StoreHelper.addItemStack(cap_list,itemStack_l);
+                if (itemStack_l.getItem() instanceof ItemRecordPage){
+                    ItemStack storeItem = ((ItemRecordPage) itemStack_l.getItem()).getStoreItem(itemStack_l);
+                    if (!storeItem.isEmpty()){
+                        StoreHelper.addItemStack(cap_list,storeItem);
+                        itemStack_l.shrink(1);
+                        if (world.isClientSide ) {
+                            entity.sendMessage(new StringTextComponent("储存"+":"+storeItem.getDisplayName().getString()), UUID.randomUUID());
+                            entity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
+                        }
+                    }
+                }
             }else {
                 if (itemStack.getItem() instanceof ItemChronicler) {
                     if (!world.isClientSide ) {
@@ -72,12 +85,12 @@ public class ItemChronicler extends Item {
         return itemListCapability.serializeNBT();
     }
 
-    public static void readListNBT(ItemStack stack, @Nullable ListNBT nbt) {
-        if (nbt != null) {
-            CapabilityItemList capabilityItemList = getItemListCapability(stack);
-            capabilityItemList.deserializeNBT(nbt);
-        }
-    }
+//    public static void readListNBT(ItemStack stack, @Nullable ListNBT nbt) {
+//        if (nbt != null) {
+//            CapabilityItemList capabilityItemList = getItemListCapability(stack);
+//            capabilityItemList.deserializeNBT(nbt);
+//        }
+//    }
 
 
     public static CapabilityItemList getItemListCapability(ItemStack itemStack){
