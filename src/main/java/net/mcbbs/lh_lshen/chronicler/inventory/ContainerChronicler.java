@@ -1,6 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.inventory;
 
 import com.google.common.collect.Lists;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
@@ -28,6 +29,7 @@ public class ContainerChronicler extends Container {
 //    private Map<String, List<ItemStack>> allItemMap;
     private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
+    private CapabilityStellarisEnergy energy = new CapabilityStellarisEnergy();
     public SelectCompnent selectCompnent;
     public boolean selectBoxOpen;
 
@@ -165,8 +167,8 @@ public class ContainerChronicler extends Container {
         try {
             capabilityItemList.deserializeNBT(listNBT);
             if (capabilityItemList!=null) {
-                ContainerChronicler chronicler = new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
-                return chronicler;
+                ContainerChronicler container = new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
+                return container;
             }
             } catch (IllegalArgumentException iae) {
                 Logger.getGlobal().info(iae.toString());
@@ -196,6 +198,17 @@ public class ContainerChronicler extends Container {
 
     public void setCapabilityItemList(CapabilityItemList cap_list){
         this.cap_list = cap_list;
+    }
+
+    public CapabilityStellarisEnergy getEnergy() {
+        if (energy!=null) {
+            return this.energy;
+        }
+        return new CapabilityStellarisEnergy();
+    }
+
+    public void setEnergy(CapabilityStellarisEnergy energy) {
+        this.energy = energy;
     }
 
     public ItemStack getItemStackChronicler() {

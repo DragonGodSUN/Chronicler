@@ -2,6 +2,8 @@ package net.mcbbs.lh_lshen.chronicler.inventory.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.mcbbs.lh_lshen.chronicler.Utils;
+import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
@@ -18,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.List;
 
@@ -450,6 +453,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         matrixStack.translate(0, 0, 100);
         {
             renderSelectBox(matrixStack,mouseX,mouseY,partialTicks);
+            renderEnergyStellaris(matrixStack,mouseX,mouseY,partialTicks);
         }
     }
 
@@ -495,6 +499,14 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         }
 
 
+    }
+
+    private void renderEnergyStellaris(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks){
+        ICapabilityStellarisEnergy energy = this.menu.getEnergy();
+        int point = energy.getEnergyPoint();
+
+        getMinecraft().textureManager.bind(LOADING);
+        getMinecraft().font.draw(matrixStack, ""+point, leftPos + 83, topPos + 23, TextFormatting.DARK_GRAY.getColor());
     }
 
     public void synData(ItemStack chronicler, CapabilityItemList capabilityItemList){

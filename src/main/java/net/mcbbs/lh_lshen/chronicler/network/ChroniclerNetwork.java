@@ -1,10 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.network;
 
 import net.mcbbs.lh_lshen.chronicler.Utils;
-import net.mcbbs.lh_lshen.chronicler.network.packages.BasicMessage;
-import net.mcbbs.lh_lshen.chronicler.network.packages.ProduceMessage;
-import net.mcbbs.lh_lshen.chronicler.network.packages.SynCapMessage;
-import net.mcbbs.lh_lshen.chronicler.network.packages.SynItemNBTMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -45,6 +42,8 @@ public class ChroniclerNetwork {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), SynItemNBTMessage.class, SynItemNBTMessage::encode, SynItemNBTMessage::decode, SynItemNBTMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        INSTANCE.registerMessage(nextID(), SynContainerEnergyCapMessage.class, SynContainerEnergyCapMessage::encode, SynContainerEnergyCapMessage::decode, SynContainerEnergyCapMessage::handler,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 //        INSTANCE.registerMessage(nextID(), SynCapMessage.class, SynCapMessage::encode, SynCapMessage::decode, SynCapMessage::handler,
 //                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }

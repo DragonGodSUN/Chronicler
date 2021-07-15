@@ -49,17 +49,6 @@ public class CapabilityItemList implements ICapabilityItemList {
 
     @Override
     public List<String> getKeyList() {
-//        boolean isAsyn = false;
-//        for (String key:itemAllMap.keySet()){
-//            if (!keyList.contains(key)&&!key.equals("")) {
-//                isAsyn = true;
-//                break;
-//            }
-//        }
-//        if (isAsyn){
-//            keyList.clear();
-//            keyList.addAll(getAllMap().keySet());
-//        }
         return keyList;
     }
 
@@ -257,27 +246,6 @@ public class CapabilityItemList implements ICapabilityItemList {
 
             }
         }
-
-//        for (INBT tag:nbtList){
-//            if (tag instanceof CompoundNBT){
-//                CompoundNBT itemNbt = (CompoundNBT) tag;
-//                String type = itemNbt.getString("type");
-//                if (type.equals("star")) {
-//                    ItemStack stack = ItemStack.of(itemNbt);
-//                    inventory_nbt.addItem(stack);
-//                }
-//            }
-//        }
-//
-//        for (INBT tag:nbtList){
-//            if (tag instanceof CompoundNBT){
-//                CompoundNBT itemNbt = (CompoundNBT) tag;
-//                String id_config = itemNbt.getString("id_config");
-//                if (id_list.contains(id_config)) {
-//                    itemStackConfigList.add(id_config);
-//                }
-//            }
-//        }
 
         if (!itemStackList.isEmpty()) {
             for (String id : id_list) {

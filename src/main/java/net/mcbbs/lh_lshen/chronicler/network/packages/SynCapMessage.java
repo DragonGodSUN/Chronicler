@@ -3,6 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.network.packages;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;

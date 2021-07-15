@@ -1,13 +1,14 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
-import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
-import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
+import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
+import net.mcbbs.lh_lshen.chronicler.network.packages.SynContainerEnergyCapMessage;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -24,11 +25,8 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
-import javax.annotation.Nullable;
-import java.util.List;
 import java.util.UUID;
 
 public class ItemChronicler extends Item {
@@ -36,14 +34,32 @@ public class ItemChronicler extends Item {
         super(new Properties().tab(ItemGroup.TAB_TOOLS).fireResistant().stacksTo(1));
     }
 
+//  使用能力系统进行充能，不选择shareNbt，一个原因是该NBT改变时，持有的ItemStack会不断重载
+    @Override
+    public void inventoryTick(ItemStack itemStack, World world, Entity entity, int tick, boolean flag) {
+        if (!entity.level.isClientSide) {
+            LazyOptional<ICapabilityStellarisEnergy> energyLazyOptional = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null);
+            energyLazyOptional.ifPresent((energy)->{
+                energy.charge(1);
+//              将服务端的数据发送给客户端的容器
+                if (energy.isDirty() && entity instanceof PlayerEntity ){
+                    if (((PlayerEntity) entity).containerMenu instanceof ContainerChronicler) {
+                        ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(energy), (PlayerEntity) entity);
+                    }
+                    energy.setDirty(false);
+                }
+            });
+        }
+        super.inventoryTick(itemStack, world, entity, tick, flag);
+    }
+
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity entity, Hand hand) {
-        ItemStack itemStack = entity.getItemInHand(hand);
+        ItemStack itemStack = entity.getMainHandItem();
         ItemStack itemStack_l = entity.getOffhandItem();
         LazyOptional<ICapabilityItemList> capability = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY);
         capability.ifPresent((cap_list)->{
             if (entity.isShiftKeyDown()) {
-//                StoreHelper.addItemStack(cap_list,itemStack_l);
                 if (itemStack_l.getItem() instanceof ItemRecordPage){
                     ItemStack storeItem = ((ItemRecordPage) itemStack_l.getItem()).getStoreItem(itemStack_l);
                     if (!storeItem.isEmpty()){
@@ -62,8 +78,9 @@ public class ItemChronicler extends Item {
                         NetworkHooks.openGui((ServerPlayerEntity) entity,
                                 containerProvider,
                                 (packetBuffer)->{
+//                            发送物品列表信息到容器中
                                     ListNBT listNBT = getListNBT(itemStack);
-                                    packetBuffer.writeItemStack(itemStack,true);
+                                    packetBuffer.writeItemStack(itemStack,false);
                                     packetBuffer.writeInt(listNBT.size());
                                     for (int i=0;i<listNBT.size();i++){
                                         CompoundNBT nbt = listNBT.getCompound(i);
@@ -84,14 +101,6 @@ public class ItemChronicler extends Item {
         CapabilityItemList itemListCapability = getItemListCapability(stack);
         return itemListCapability.serializeNBT();
     }
-
-//    public static void readListNBT(ItemStack stack, @Nullable ListNBT nbt) {
-//        if (nbt != null) {
-//            CapabilityItemList capabilityItemList = getItemListCapability(stack);
-//            capabilityItemList.deserializeNBT(nbt);
-//        }
-//    }
-
 
     public static CapabilityItemList getItemListCapability(ItemStack itemStack){
         ICapabilityItemList cap_list = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
@@ -135,16 +144,24 @@ public class ItemChronicler extends Item {
 //
 //    }
 
-    @Nullable
-    @Override
-    public CompoundNBT getShareTag(ItemStack stack) {
-        if (super.getShareTag(stack) == null) {
-            return new CompoundNBT();
-        }
-        return super.getShareTag(stack);
-    }
-
+//    @Nullable
 //    @Override
+//    public CompoundNBT getShareTag(ItemStack stack) {
+//        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+//        if (energy == null) {
+//            return new CompoundNBT();
+//        }
+//        CompoundNBT nbt = energy.serializeNBT();
+//        return nbt;
+//    }
+//
+//    @Override
+//    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+//        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+//        energy.deserializeNBT(nbt);
+//    }
+
+    //    @Override
 //    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
 //        SelectCompnent selectCompnent = new SelectCompnent();
 //        if (nbt != null) {
@@ -165,11 +182,11 @@ public class ItemChronicler extends Item {
 //        super.readShareTag(stack, nbt);
 //    }
 
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-        return new ItemListProvider();
-    }
+//    @Nullable
+//    @Override
+//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+//        return new ItemListProvider();
+//    }
 
     private static class ContainerProviderChronicler implements INamedContainerProvider {
         public ContainerProviderChronicler(ItemChronicler itemChronicler, ItemStack itemStackChronicler) {
