@@ -7,6 +7,8 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface ICapabilityStellarisEnergy extends INBTSerializable<CompoundNBT> {
     int getEnergyPoint();
     int getEnergyMax();
+    String getId();
+    void setId(String id);
     void setEnergyPoint(int point);
     void setEnergyMax(int point);
     void charge(int point);

@@ -80,6 +80,8 @@ public class ItemChronicler extends Item {
                                 (packetBuffer)->{
 //                            发送物品列表信息到容器中
                                     ListNBT listNBT = getListNBT(itemStack);
+                                    setRandomId(itemStack);
+                                    packetBuffer.writeUtf(getId(itemStack));
                                     packetBuffer.writeItemStack(itemStack,false);
                                     packetBuffer.writeInt(listNBT.size());
                                     for (int i=0;i<listNBT.size();i++){
@@ -110,6 +112,27 @@ public class ItemChronicler extends Item {
         return (CapabilityItemList) cap_list;
     }
 
+    public static void setRandomId(ItemStack stack){
+        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        if (!stack.isEmpty()){
+            energy.setId(UUID.randomUUID().toString());
+        }
+    }
+
+    public static void setId(ItemStack stack, String id){
+        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        if (!stack.isEmpty()){
+            energy.setId(id);
+        }
+    }
+
+    public static String getId(ItemStack stack){
+        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        if (!stack.isEmpty()){
+            return  energy.getId();
+        }
+        return "";
+    }
 //    public SelectCompnent getSelectCompnent(ContainerChronicler container, ItemStack stack) {
 //        CompoundNBT nbt = stack.getShareTag();
 //        SelectCompnent selectCompnent = new SelectCompnent();

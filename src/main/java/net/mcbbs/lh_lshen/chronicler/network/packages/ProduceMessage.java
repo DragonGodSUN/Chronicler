@@ -1,5 +1,8 @@
 package net.mcbbs.lh_lshen.chronicler.network.packages;
 
+import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -31,11 +34,16 @@ public class ProduceMessage extends BasicMessage {
                     return;
                 }
                 ItemStack itemStack = message.itemStack;
-                if (itemStack != null) {
-                    if (sender.inventory.getFreeSlot()!=-1) {
-                        sender.inventory.add(itemStack.copy());
-                    }else {
-                        sender.drop(itemStack.copy(),true);
+                ItemStack chroniciler = sender.getMainHandItem();
+                ICapabilityStellarisEnergy energy = chroniciler.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+                if (itemStack != null && chroniciler.getItem() instanceof ItemChronicler) {
+                    if (energy.canCost(1000)) {
+                        if (sender.inventory.getFreeSlot()!=-1) {
+                            sender.inventory.add(itemStack.copy());
+                        }else {
+                            sender.drop(itemStack.copy(),true);
+                        }
+                        energy.cost(1000);
                     }
                 }
             });

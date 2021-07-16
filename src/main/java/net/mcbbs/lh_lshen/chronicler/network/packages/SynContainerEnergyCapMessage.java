@@ -43,8 +43,11 @@ public class SynContainerEnergyCapMessage {
                 PlayerEntity player = Minecraft.getInstance().player;
                 Container container = player.containerMenu;
                 if (container instanceof ContainerChronicler){
-                    ContainerChronicler chronicler = (ContainerChronicler) container;
-                    chronicler.setEnergy(cap);
+                    ContainerChronicler containerChronicler = (ContainerChronicler) container;
+                    boolean f = containerChronicler.getEnergy().getId().equals(cap.getId());
+                    if (f) {
+                        containerChronicler.setEnergy(cap);
+                    }
                 }
 
             });

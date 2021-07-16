@@ -1,6 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.inventory;
 
 import com.google.common.collect.Lists;
+import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
@@ -42,6 +43,7 @@ public class ContainerChronicler extends Container {
                                   ItemStack itemStack) {
         super(CommonEventHandler.containerTypeChronicler, windowId);
         this.cap_list = cap_list;
+        this.energy = (CapabilityStellarisEnergy) itemStack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
         this.itemStack = itemStack;
 //        this.allItemMap = cap_list.getAllMap();
         this.inventory_player = playerInv;
@@ -155,6 +157,7 @@ public class ContainerChronicler extends Container {
     }
 
     public static ContainerChronicler createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
+        String id = extraData.readUtf();
         ItemStack stack = extraData.readItem();
         int size = extraData.readInt();
         ListNBT listNBT = new ListNBT();
@@ -164,6 +167,7 @@ public class ContainerChronicler extends Container {
         }
         CapabilityItemList capabilityItemList = new CapabilityItemList();
         if (stack.getItem() instanceof ItemChronicler){
+            ItemChronicler.setId(stack,id);
         try {
             capabilityItemList.deserializeNBT(listNBT);
             if (capabilityItemList!=null) {

@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundNBT;
 public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     private int energy;
     private int maxEnergy = 10000;
+    private String id = "";
     private boolean isDirty;
     @Override
     public int getEnergyPoint() {
@@ -25,6 +26,16 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     @Override
     public void setEnergyMax(int point) {
         this.maxEnergy = point;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -72,6 +83,7 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putInt("energy",this.energy);
         nbt.putInt("max",this.maxEnergy);
+        nbt.putString("id",this.id);
         return nbt;
     }
 
@@ -79,5 +91,6 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     public void deserializeNBT(CompoundNBT nbt) {
         this.energy = nbt.getInt("energy");
         this.maxEnergy = nbt.getInt("max");
+        this.id = nbt.getString("id");
     }
 }

@@ -42,6 +42,8 @@ public class ChroniclerNetwork {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), SynItemNBTMessage.class, SynItemNBTMessage::encode, SynItemNBTMessage::decode, SynItemNBTMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        INSTANCE.registerMessage(nextID(), ManageEnergyCapMessage.class, ManageEnergyCapMessage::encode, ManageEnergyCapMessage::decode, ManageEnergyCapMessage::handler,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), SynContainerEnergyCapMessage.class, SynContainerEnergyCapMessage::encode, SynContainerEnergyCapMessage::decode, SynContainerEnergyCapMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 //        INSTANCE.registerMessage(nextID(), SynCapMessage.class, SynCapMessage::encode, SynCapMessage::decode, SynCapMessage::handler,

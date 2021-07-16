@@ -5,6 +5,7 @@ import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
@@ -18,11 +19,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
     private static final ResourceLocation BG = new ResourceLocation(Utils.MOD_ID, "textures/gui/door_bg.png");
@@ -368,11 +372,18 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     CapabilityItemList cap_list = this.menu.getCapabilityItemList();
                     ItemStack chronicler = this.menu.getItemStackChronicler();
                     ItemStack selectItem = selectCompnent.selectItemStack;
+                    ICapabilityStellarisEnergy energy = this.menu.getEnergy();
                     if (selectItem != null && this.menu.selectBoxOpen) {
-                        if (this.getMinecraft().player!=null) {
-                            this.getMinecraft().player.inventory.add(selectItem.copy());
+                        if (energy.canCost(1000)) {
+                            if (this.getMinecraft().player!=null) {
+                                this.getMinecraft().player.inventory.add(selectItem.copy());
+                            }
+                            ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
+                        }else {
+                            if (this.getMinecraft().player!=null) {
+                                this.getMinecraft().player.sendMessage(new StringTextComponent("星能不足"), UUID.randomUUID());
+                            }
                         }
-                        ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
                     }
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("生成"), x, y), StringTextComponent.EMPTY);
@@ -504,9 +515,10 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
     private void renderEnergyStellaris(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks){
         ICapabilityStellarisEnergy energy = this.menu.getEnergy();
         int point = energy.getEnergyPoint();
-
         getMinecraft().textureManager.bind(LOADING);
-        getMinecraft().font.draw(matrixStack, ""+point, leftPos + 83, topPos + 23, TextFormatting.DARK_GRAY.getColor());
+        float e = MathHelper.clamp(((float)point)/((float)energy.getEnergyMax()),0.0f,1.0f);
+        blit(matrixStack,leftPos+45,topPos+21,0,0,(int) (25*e),8);
+        getMinecraft().font.draw(matrixStack, ""+point, leftPos + 83, topPos + 23, TextFormatting.AQUA.getColor());
     }
 
     public void synData(ItemStack chronicler, CapabilityItemList capabilityItemList){
