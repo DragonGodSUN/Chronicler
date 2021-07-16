@@ -42,7 +42,7 @@ public class ItemChronicler extends Item {
             energyLazyOptional.ifPresent((energy)->{
                 energy.charge(1);
 //              将服务端的数据发送给客户端的容器
-                if (energy.isDirty() && entity instanceof PlayerEntity ){
+                if (energy.isDirty() && entity !=null && entity instanceof PlayerEntity ){
                     if (((PlayerEntity) entity).containerMenu instanceof ContainerChronicler) {
                         ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(energy), (PlayerEntity) entity);
                     }
@@ -59,6 +59,7 @@ public class ItemChronicler extends Item {
         ItemStack itemStack_l = entity.getOffhandItem();
         LazyOptional<ICapabilityItemList> capability = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY);
         capability.ifPresent((cap_list)->{
+        if (itemStack.getItem() instanceof ItemChronicler) {
             if (entity.isShiftKeyDown()) {
                 if (itemStack_l.getItem() instanceof ItemRecordPage){
                     ItemStack storeItem = ((ItemRecordPage) itemStack_l.getItem()).getStoreItem(itemStack_l);
@@ -72,26 +73,25 @@ public class ItemChronicler extends Item {
                     }
                 }
             }else {
-                if (itemStack.getItem() instanceof ItemChronicler) {
-                    if (!world.isClientSide ) {
-                        INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, itemStack);
-                        NetworkHooks.openGui((ServerPlayerEntity) entity,
-                                containerProvider,
-                                (packetBuffer)->{
+                if (!world.isClientSide ) {
+                    INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, itemStack);
+                    NetworkHooks.openGui((ServerPlayerEntity) entity,
+                            containerProvider,
+                            (packetBuffer)->{
 //                            发送物品列表信息到容器中
-                                    ListNBT listNBT = getListNBT(itemStack);
-                                    setRandomId(itemStack);
-                                    packetBuffer.writeUtf(getId(itemStack));
-                                    packetBuffer.writeItemStack(itemStack,false);
-                                    packetBuffer.writeInt(listNBT.size());
-                                    for (int i=0;i<listNBT.size();i++){
-                                        CompoundNBT nbt = listNBT.getCompound(i);
-                                        if (nbt !=null) {
-                                            packetBuffer.writeNbt(nbt);
-                                        }
+                                ListNBT listNBT = getListNBT(itemStack);
+                                setRandomId(itemStack);
+                                packetBuffer.writeUtf(getId(itemStack));
+                                packetBuffer.writeItemStack(itemStack,false);
+                                packetBuffer.writeInt(listNBT.size());
+                                for (int i=0;i<listNBT.size();i++){
+                                    CompoundNBT nbt = listNBT.getCompound(i);
+                                    if (nbt !=null) {
+                                        packetBuffer.writeNbt(nbt);
                                     }
-                                });
-                    }
+                                }
+                            });
+                }
                     entity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
                 }
             }

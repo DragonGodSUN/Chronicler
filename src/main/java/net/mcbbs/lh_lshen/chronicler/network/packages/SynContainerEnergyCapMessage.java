@@ -8,6 +8,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -39,19 +41,23 @@ public class SynContainerEnergyCapMessage {
     public static void handler(SynContainerEnergyCapMessage message, Supplier<NetworkEvent.Context> ctx) {
         if (ctx.get().getDirection().getReceptionSide().isClient()) {
             ctx.get().enqueueWork(() -> {
-                CapabilityStellarisEnergy cap = (CapabilityStellarisEnergy) message.energy;
-                PlayerEntity player = Minecraft.getInstance().player;
-                Container container = player.containerMenu;
-                if (container instanceof ContainerChronicler){
-                    ContainerChronicler containerChronicler = (ContainerChronicler) container;
-                    boolean f = containerChronicler.getEnergy().getId().equals(cap.getId());
-                    if (f) {
-                        containerChronicler.setEnergy(cap);
-                    }
-                }
-
+                setCapability(message);
             });
             ctx.get().setPacketHandled(true);
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static void setCapability(SynContainerEnergyCapMessage message){
+        CapabilityStellarisEnergy cap = (CapabilityStellarisEnergy) message.energy;
+        PlayerEntity player = Minecraft.getInstance().player;
+        Container container = player.containerMenu;
+        if (container instanceof ContainerChronicler){
+            ContainerChronicler containerChronicler = (ContainerChronicler) container;
+            boolean f = containerChronicler.getEnergy().getId().equals(cap.getId());
+            if (f) {
+                containerChronicler.setEnergy(cap);
+            }
         }
     }
 }
