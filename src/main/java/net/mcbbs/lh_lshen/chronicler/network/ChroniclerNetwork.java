@@ -2,6 +2,10 @@ package net.mcbbs.lh_lshen.chronicler.network;
 
 import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.network.packages.*;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageEnergyCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemListCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynContainerEnergyCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemNBTMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -36,11 +40,11 @@ public class ChroniclerNetwork {
     private static void addMessages() {
         INSTANCE.registerMessage(nextID(), BasicMessage.class, BasicMessage::encode, BasicMessage::decode, BasicMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        INSTANCE.registerMessage(nextID(), SynCapMessage.class, SynCapMessage::encode, SynCapMessage::decode, SynCapMessage::handler,
+        INSTANCE.registerMessage(nextID(), ManageItemListCapMessage.class, ManageItemListCapMessage::encode, ManageItemListCapMessage::decode, ManageItemListCapMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), ProduceMessage.class, ProduceMessage::encode, ProduceMessage::decode, ProduceMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        INSTANCE.registerMessage(nextID(), SynItemNBTMessage.class, SynItemNBTMessage::encode, SynItemNBTMessage::decode, SynItemNBTMessage::handler,
+        INSTANCE.registerMessage(nextID(), ManageItemNBTMessage.class, ManageItemNBTMessage::encode, ManageItemNBTMessage::decode, ManageItemNBTMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
         INSTANCE.registerMessage(nextID(), ManageEnergyCapMessage.class, ManageEnergyCapMessage::encode, ManageEnergyCapMessage::decode, ManageEnergyCapMessage::handler,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));

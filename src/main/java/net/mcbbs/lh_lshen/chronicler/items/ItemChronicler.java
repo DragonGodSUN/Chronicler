@@ -4,10 +4,9 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
-import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.SynContainerEnergyCapMessage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -38,17 +37,13 @@ public class ItemChronicler extends Item {
     @Override
     public void inventoryTick(ItemStack itemStack, World world, Entity entity, int tick, boolean flag) {
         if (!entity.level.isClientSide) {
-            LazyOptional<ICapabilityStellarisEnergy> energyLazyOptional = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null);
-            energyLazyOptional.ifPresent((energy)->{
-                energy.charge(1);
-//              将服务端的数据发送给客户端的容器
-                if (energy.isDirty() && entity !=null && entity instanceof PlayerEntity ){
-                    if (((PlayerEntity) entity).containerMenu instanceof ContainerChronicler) {
-                        ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(energy), (PlayerEntity) entity);
-                    }
-                    energy.setDirty(false);
+            if (entity instanceof PlayerEntity) {
+                ICapabilityStellarisEnergy energy =  itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null).orElse(null);
+                if (energy!=null){
+                    energy.charge(1);
                 }
-            });
+                DataHelper.synEnergyCap(itemStack, (PlayerEntity) entity);
+            }
         }
         super.inventoryTick(itemStack, world, entity, tick, flag);
     }
@@ -57,82 +52,89 @@ public class ItemChronicler extends Item {
     public ActionResult<ItemStack> use(World world, PlayerEntity entity, Hand hand) {
         ItemStack itemStack = entity.getMainHandItem();
         ItemStack itemStack_l = entity.getOffhandItem();
+        if (itemStack.getItem() instanceof ItemChronicler) {
         LazyOptional<ICapabilityItemList> capability = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY);
         capability.ifPresent((cap_list)->{
-        if (itemStack.getItem() instanceof ItemChronicler) {
             if (entity.isShiftKeyDown()) {
-                if (itemStack_l.getItem() instanceof ItemRecordPage){
-                    ItemStack storeItem = ((ItemRecordPage) itemStack_l.getItem()).getStoreItem(itemStack_l);
-                    if (!storeItem.isEmpty()){
-                        StoreHelper.addItemStack(cap_list,storeItem);
-                        itemStack_l.shrink(1);
-                        if (world.isClientSide ) {
-                            entity.sendMessage(new StringTextComponent("储存"+":"+storeItem.getDisplayName().getString()), UUID.randomUUID());
-                            entity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
-                        }
-                    }
-                }
+                loadPage(itemStack_l, world, entity,cap_list);
             }else {
                 if (!world.isClientSide ) {
-                    INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, itemStack);
-                    NetworkHooks.openGui((ServerPlayerEntity) entity,
-                            containerProvider,
-                            (packetBuffer)->{
-//                            发送物品列表信息到容器中
-                                ListNBT listNBT = getListNBT(itemStack);
-                                setRandomId(itemStack);
-                                packetBuffer.writeUtf(getId(itemStack));
-                                packetBuffer.writeItemStack(itemStack,false);
-                                packetBuffer.writeInt(listNBT.size());
-                                for (int i=0;i<listNBT.size();i++){
-                                    CompoundNBT nbt = listNBT.getCompound(i);
-                                    if (nbt !=null) {
-                                        packetBuffer.writeNbt(nbt);
-                                    }
-                                }
-                            });
+                    openGUI(itemStack, (ServerPlayerEntity) entity);
                 }
-                    entity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
-                }
+            entity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
             }
         });
         return ActionResult.success(itemStack);
+        }
+        return  super.use(world,entity,hand);
+    }
+    
+    private void openGUI(ItemStack chronicler, ServerPlayerEntity serverPlayerEntity){
+        INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, chronicler);
+        NetworkHooks.openGui(serverPlayerEntity,
+                containerProvider,
+//               发送物品列表信息到容器中
+                (packetBuffer)->{
+                    setRandomId(chronicler);
+                    ListNBT listNBT = getListNBT(chronicler);
+                    packetBuffer.writeItemStack(chronicler,false);
+                    packetBuffer.writeInt(listNBT.size());
+                    for (int i=0;i<listNBT.size();i++){
+                        CompoundNBT nbt = listNBT.getCompound(i);
+                        if (nbt !=null) {
+                            packetBuffer.writeNbt(nbt);
+                        }
+                    }
+                    packetBuffer.writeNbt(DataHelper.getStellarisEnergyCapability(chronicler).serializeNBT());
+                    packetBuffer.writeNbt(DataHelper.getInscriptionCapability(chronicler).serializeNBT());
+                });
+    }
+        private void loadInscription(){
+
+        }
+
+    private void loadPage(ItemStack off, World world, PlayerEntity playerEntity, ICapabilityItemList cap_list){
+        if (off.getItem() instanceof ItemRecordPage){
+            ItemStack storeItem = ((ItemRecordPage) off.getItem()).getStoreItem(off);
+            if (!storeItem.isEmpty()){
+                StoreHelper.addItemStack(cap_list,storeItem);
+                off.shrink(1);
+                if (world.isClientSide ) {
+                    playerEntity.sendMessage(new StringTextComponent("储存"+":"+storeItem.getDisplayName().getString()), UUID.randomUUID());
+                    playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
+                }
+            }
+        }
     }
 
     public static ListNBT getListNBT(ItemStack stack) {
-        CapabilityItemList itemListCapability = getItemListCapability(stack);
+        CapabilityItemList itemListCapability = DataHelper.getItemListCapability(stack);
         return itemListCapability.serializeNBT();
     }
 
-    public static CapabilityItemList getItemListCapability(ItemStack itemStack){
-        ICapabilityItemList cap_list = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-        if (cap_list == null || !(cap_list instanceof ICapabilityItemList)) {
-            return new CapabilityItemList();
-        }
-        return (CapabilityItemList) cap_list;
-    }
 
     public static void setRandomId(ItemStack stack){
-        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
         if (!stack.isEmpty()){
-            energy.setId(UUID.randomUUID().toString());
+            cap_list.setUuid(UUID.randomUUID().toString());
         }
     }
 
     public static void setId(ItemStack stack, String id){
-        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
         if (!stack.isEmpty()){
-            energy.setId(id);
+            cap_list.setUuid(id);
         }
     }
 
     public static String getId(ItemStack stack){
-        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
         if (!stack.isEmpty()){
-            return  energy.getId();
+            return  cap_list.getUuid();
         }
         return "";
     }
+
 //    public SelectCompnent getSelectCompnent(ContainerChronicler container, ItemStack stack) {
 //        CompoundNBT nbt = stack.getShareTag();
 //        SelectCompnent selectCompnent = new SelectCompnent();
@@ -227,7 +229,9 @@ public class ItemChronicler extends Item {
         public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
             ContainerChronicler newContainerServerSide =
                     ContainerChronicler.createContainerServerSide(windowID, playerInventory,
-                            itemChronicler.getItemListCapability(itemStackChronicler),
+                            DataHelper.getItemListCapability(itemStackChronicler),
+                            DataHelper.getStellarisEnergyCapability(itemStackChronicler),
+                            DataHelper.getInscriptionCapability(itemStackChronicler),
                             itemStackChronicler);
             return newContainerServerSide;
         }

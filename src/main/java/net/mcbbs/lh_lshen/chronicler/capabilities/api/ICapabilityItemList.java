@@ -13,6 +13,8 @@ import java.util.Map;
 public interface ICapabilityItemList extends INBTSerializable<ListNBT> {
     Map<String, List<ItemStack>> getAllMap();
     List<String> getKeyList();
+    String getUuid();
+    void setUuid(String uuid);
     void setKeyList(List<String> keyList);
     void setKeyIndex(String id, int index);
     void setAllMap(Map<String, List<ItemStack>> map);

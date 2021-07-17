@@ -3,7 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.items;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.SynItemNBTMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemNBTMessage;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -16,6 +16,8 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -75,10 +77,12 @@ public class ItemRecordPage extends Item {
         }
     }
 
-    public void storeItem(ItemStack page, ItemStack stack){
+    public void storeItem(ItemStack page, ItemStack stack, World world){
         CompoundNBT nbt = NBTHelper.getSafeNBTCompond(page);
         stack.save(nbt);
-        ChroniclerNetwork.INSTANCE.sendToServer(new SynItemNBTMessage(page));
+        if (world.isClientSide) {
+            ChroniclerNetwork.INSTANCE.sendToServer(new ManageItemNBTMessage(page));
+        }
     }
 
     public ItemStack getStoreItem(ItemStack stack){

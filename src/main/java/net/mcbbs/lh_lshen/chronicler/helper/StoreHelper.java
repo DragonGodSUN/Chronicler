@@ -4,9 +4,8 @@ import com.google.common.collect.Lists;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.SynCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemListCapMessage;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
@@ -195,7 +194,7 @@ public class StoreHelper {
     }
 
     public static void synCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
-        ChroniclerNetwork.INSTANCE.sendToServer(new SynCapMessage(chronicler,capabilityItemList));
+        ChroniclerNetwork.INSTANCE.sendToServer(new ManageItemListCapMessage(chronicler,capabilityItemList));
     }
 
 }

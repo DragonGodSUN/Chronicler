@@ -1,7 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.inventory;
 
 import com.google.common.collect.Lists;
-import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
@@ -20,17 +20,18 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class ContainerChronicler extends Container {
 
-    private CapabilityItemList cap_list;
+    private String id;
     private ItemStack itemStack;
+    private CapabilityItemList cap_list;
+    private CapabilityStellarisEnergy energy;
+    private CapabilityInscription inscription;
 //    private Map<String, List<ItemStack>> allItemMap;
     private PlayerInventory inventory_player;
     private List<Inventory> inventories = Lists.newArrayList();
-    private CapabilityStellarisEnergy energy = new CapabilityStellarisEnergy();
     public SelectCompnent selectCompnent;
     public boolean selectBoxOpen;
 
@@ -40,13 +41,16 @@ public class ContainerChronicler extends Container {
 
     protected ContainerChronicler(int windowId, PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
+                                  CapabilityStellarisEnergy energy,
+                                  CapabilityInscription inscription,
                                   ItemStack itemStack) {
         super(CommonEventHandler.containerTypeChronicler, windowId);
         this.cap_list = cap_list;
-        this.energy = (CapabilityStellarisEnergy) itemStack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
+        this.energy = energy;
+        this.inscription = inscription;
         this.itemStack = itemStack;
-//        this.allItemMap = cap_list.getAllMap();
         this.inventory_player = playerInv;
+        this.id = cap_list.getUuid();
         initSelectCompnent();
         loadSlots();
     }
@@ -151,13 +155,12 @@ public class ContainerChronicler extends Container {
         return false;
     }
 
-    public static ContainerChronicler createContainerServerSide(int windowID, PlayerInventory playerInventory, CapabilityItemList cap_list,
-                                                                ItemStack itemStack) {
-        return new ContainerChronicler(windowID, playerInventory, cap_list, itemStack);
+    public static ContainerChronicler createContainerServerSide(int windowID, PlayerInventory playerInventory, CapabilityItemList cap_list, CapabilityStellarisEnergy energy,
+                                                                CapabilityInscription inscription, ItemStack itemStack) {
+        return new ContainerChronicler(windowID, playerInventory, cap_list, energy,inscription, itemStack);
     }
 
     public static ContainerChronicler createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
-        String id = extraData.readUtf();
         ItemStack stack = extraData.readItem();
         int size = extraData.readInt();
         ListNBT listNBT = new ListNBT();
@@ -165,19 +168,26 @@ public class ContainerChronicler extends Container {
             CompoundNBT nbt = extraData.readNbt();
             listNBT.add(nbt);
         }
+        CompoundNBT energyNBT = extraData.readNbt();
+        CompoundNBT inscriptionNBT = extraData.readNbt();
+
         CapabilityItemList capabilityItemList = new CapabilityItemList();
+        CapabilityStellarisEnergy capabilityEnergy = new CapabilityStellarisEnergy();
+        CapabilityInscription capabilityInscription = new CapabilityInscription();
+
         if (stack.getItem() instanceof ItemChronicler){
-            ItemChronicler.setId(stack,id);
-        try {
             capabilityItemList.deserializeNBT(listNBT);
+            capabilityEnergy.deserializeNBT(energyNBT);
+            capabilityInscription.deserializeNBT(inscriptionNBT);
+        try {
             if (capabilityItemList!=null) {
-                ContainerChronicler container = new ContainerChronicler(windowID, playerInventory, capabilityItemList, stack);
+                ContainerChronicler container = new ContainerChronicler(windowID, playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, stack);
                 return container;
             }
             } catch (IllegalArgumentException iae) {
                 Logger.getGlobal().info(iae.toString());
             }
-            return new ContainerChronicler(windowID, playerInventory, capabilityItemList, ItemStack.EMPTY);
+            return new ContainerChronicler(windowID, playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, ItemStack.EMPTY);
         }
         return null;
     }
@@ -191,6 +201,16 @@ public class ContainerChronicler extends Container {
     @Override
     public boolean canDragTo(Slot slot) {
         return false;
+    }
+
+//  =================================Capability Setter and Getter================================================
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public CapabilityItemList getCapabilityItemList() {
@@ -215,11 +235,22 @@ public class ContainerChronicler extends Container {
         this.energy = energy;
     }
 
+    public CapabilityInscription getInscription() {
+        if (inscription!=null) {
+            return this.inscription;
+        }
+        return new CapabilityInscription();
+    }
+
+    public void setInscription(CapabilityInscription inscription) {
+        this.inscription = inscription;
+    }
+
     public ItemStack getItemStackChronicler() {
         return itemStack;
     }
 
-
+//====================================================================================
     @Override
     public void broadcastChanges() {
         if (cap_list.isDirty()) {

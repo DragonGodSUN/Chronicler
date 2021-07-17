@@ -1,9 +1,8 @@
-package net.mcbbs.lh_lshen.chronicler.network.packages;
+package net.mcbbs.lh_lshen.chronicler.network.packages.syn_data;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -15,16 +14,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SynCapMessage {
+public class ManageItemListCapMessage {
     private ItemStack itemStackChronicler;
     private ICapabilityItemList capabilityItemList;
 
-    public SynCapMessage(ItemStack itemStackChronicler, ICapabilityItemList capabilityItemList) {
+    public ManageItemListCapMessage(ItemStack itemStackChronicler, ICapabilityItemList capabilityItemList) {
         this.itemStackChronicler = itemStackChronicler;
         this.capabilityItemList = capabilityItemList;
     }
 
-    public static void encode(SynCapMessage message, PacketBuffer buf) {
+    public static void encode(ManageItemListCapMessage message, PacketBuffer buf) {
         if (message.itemStackChronicler != null && message.itemStackChronicler.getItem() instanceof ItemChronicler) {
             ListNBT listNBT = message.capabilityItemList.serializeNBT();
             buf.writeItemStack(message.itemStackChronicler,true);
@@ -38,7 +37,7 @@ public class SynCapMessage {
         }
     }
 
-    public static SynCapMessage decode(PacketBuffer buf) {
+    public static ManageItemListCapMessage decode(PacketBuffer buf) {
         ItemStack stack = buf.readItem();
         int size = buf.readInt();
         if (stack.getItem() instanceof ItemChronicler){
@@ -50,13 +49,13 @@ public class SynCapMessage {
             CapabilityItemList capabilityItemList = new CapabilityItemList();
                 capabilityItemList.deserializeNBT(listNBT);
                 if (capabilityItemList!=null) {
-                    return new SynCapMessage(stack,capabilityItemList);
+                    return new ManageItemListCapMessage(stack,capabilityItemList);
                 }
         }
         return null;
     }
 
-    public static void handler(SynCapMessage message, Supplier<NetworkEvent.Context> ctx) {
+    public static void handler(ManageItemListCapMessage message, Supplier<NetworkEvent.Context> ctx) {
         if (ctx.get().getDirection().getReceptionSide().isServer()) {
         ctx.get().enqueueWork(() -> {
             ServerPlayerEntity sender = ctx.get().getSender();

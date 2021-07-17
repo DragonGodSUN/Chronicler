@@ -2,21 +2,18 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import javafx.util.Pair;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.List;
 import java.util.Map;
 
 public class CapabilityItemList implements ICapabilityItemList {
+    private String uuid = "";
     private Map<String, List<ItemStack>> itemAllMap = Maps.newHashMap();
     private List<String> keyList = Lists.newArrayList();
     private Inventory inventoryStar = new Inventory(8);
@@ -50,6 +47,16 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public List<String> getKeyList() {
         return keyList;
+    }
+
+    @Override
+    public String getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public void setKeyList(List<String> keyList) {
@@ -207,7 +214,10 @@ public class CapabilityItemList implements ICapabilityItemList {
             idTag.putString("id_config",id);
             nbtTagList.add(idTag);
         }
-
+            CompoundNBT idUUTag = new CompoundNBT();
+            idUUTag.putString("type","uuid");
+            idUUTag.putString("uuid",this.uuid);
+            nbtTagList.add(idUUTag);
         return nbtTagList;
     }
 
@@ -243,7 +253,9 @@ public class CapabilityItemList implements ICapabilityItemList {
                     itemStackConfigList.add(id_config);
                     }
                 }
-
+                if (type.equals("uuid")) {
+                    this.uuid = itemNbt.getString("uuid");
+                }
             }
         }
 

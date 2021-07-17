@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.events;
 
 import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.provider.InscriptionProvider;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.StellarisEnergyProvider;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
@@ -26,6 +27,9 @@ public final class CapabilityEvent {
             }
             if (ModCapability.ENERGY_CAPABILITY!=null) {
                 event.addCapability(new ResourceLocation(Utils.MOD_ID, "stellaris_energy"), new StellarisEnergyProvider());
+            }
+            if (ModCapability.INSCRIPTION_CAPABILITY!=null) {
+                event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription"), new InscriptionProvider());
             }
         }
     }
