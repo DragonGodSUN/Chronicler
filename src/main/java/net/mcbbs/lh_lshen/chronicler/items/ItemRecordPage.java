@@ -4,6 +4,7 @@ import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemNBTMessage;
+import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 public class ItemRecordPage extends Item {
     public ItemRecordPage() {
-        super(new Properties().tab(ItemGroup.TAB_TOOLS));
+        super(new Properties().tab(ModGroup.GROUP_CHRONICLER));
     }
 
     @Override

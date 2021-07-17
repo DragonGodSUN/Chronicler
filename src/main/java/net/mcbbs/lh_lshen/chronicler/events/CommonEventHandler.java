@@ -5,14 +5,19 @@ import com.google.common.collect.Maps;
 import javafx.util.Pair;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.Utils;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.provider.InscriptionProvider;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.StellarisEnergyProvider;
+import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
+import net.mcbbs.lh_lshen.chronicler.items.ItemInscription;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -42,10 +47,17 @@ public class CommonEventHandler {
     public static ContainerType<ContainerChronicler> containerTypeChronicler;
 
     @SubscribeEvent
+    public static void onCommonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(ChroniclerNetwork::registerMessage);
+        event.enqueueWork(InscriptionRegister::new);
+    }
+
+    @SubscribeEvent
     public static void onCapabilitySetupEvent(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             CapabilityManager.INSTANCE.register(ICapabilityItemList.class, new ItemListProvider.Storage(),CapabilityItemList::new);
             CapabilityManager.INSTANCE.register(ICapabilityStellarisEnergy.class, new StellarisEnergyProvider.Storage(), CapabilityStellarisEnergy::new);
+            CapabilityManager.INSTANCE.register(ICapabilityInscription.class, new InscriptionProvider.Storage(), CapabilityInscription::new);
 //                    new Capability.IStorage<ICapabilityItemList>() {
 //                        @Nullable
 //                        @Override
@@ -63,10 +75,6 @@ public class CommonEventHandler {
         });
     }
 
-    @SubscribeEvent
-    public static void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(ChroniclerNetwork::registerMessage);
-    }
 
     @SubscribeEvent
     public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {

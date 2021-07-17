@@ -1,0 +1,8 @@
+package net.mcbbs.lh_lshen.chronicler.tabs;
+
+import net.minecraft.item.ItemGroup;
+
+public class ModGroup {
+    public static final ItemGroup GROUP_CHRONICLER = new GroupChronicler("chronicler");
+
+}

@@ -1,7 +1,11 @@
 package net.mcbbs.lh_lshen.chronicler.network.packages;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.inscription.IInscription;
+import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -38,6 +42,13 @@ public class ProduceMessage extends BasicMessage {
                 ICapabilityStellarisEnergy energy = chroniciler.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
                 if (itemStack != null && chroniciler.getItem() instanceof ItemChronicler) {
                     if (energy.canCost(1000)) {
+                        ICapabilityInscription inscription = DataHelper.getInscriptionCapability(chroniciler);
+                        if (inscription!=null){
+                            IInscription iInscription = InscriptionRegister.getInscription(inscription.getInscription());
+                            if (iInscription!=null){
+                                iInscription.process(itemStack);
+                            }
+                        }
                         if (sender.inventory.getFreeSlot()!=-1) {
                             sender.inventory.add(itemStack.copy());
                         }else {
