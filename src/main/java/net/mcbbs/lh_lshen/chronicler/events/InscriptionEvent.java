@@ -42,14 +42,12 @@ public class InscriptionEvent {
             ICapabilityEffectPlayer effectPlayer = DataHelper.getEffectPlayerCapability(playerEntity);
             if (effectPlayer.getType().equals(EnumInscription.HOPE_FLOWER.getId())){
                 boolean hasItem = false;
-                ItemStack chronicler = ItemStack.EMPTY;
                 for (int i=0;i<playerEntity.inventory.getContainerSize();i++){
                     ItemStack stack = playerEntity.inventory.getItem(i);
                     if (stack.getItem() instanceof ItemChronicler){
                         ICapabilityInscription inscription = DataHelper.getInscriptionCapability(stack);
                         if (inscription.getInscription().equals(EnumInscription.HOPE_FLOWER.getId())){
                             hasItem = true;
-                            chronicler = stack;
                             break;
                         }
                     }
@@ -62,10 +60,8 @@ public class InscriptionEvent {
                 EffectInstance effect = playerEntity.getEffect(EffectRegistry.hope_flower.get());
                 if (effect.getDuration()<5){
                     int damage = effectPlayer.getCounter();
+                    playerEntity.hurt(new DamageSource("cannotStop"),10+damage);
                     effectPlayer.setCounter(0);
-                    if (!playerEntity.level.isClientSide) {
-                        playerEntity.hurt(new DamageSource("cannotStop"),10+damage);
-                    }
                     playerEntity.removeEffect(effect.getEffect());
                 }
             }

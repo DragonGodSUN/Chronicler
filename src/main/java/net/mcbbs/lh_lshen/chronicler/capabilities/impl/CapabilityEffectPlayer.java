@@ -64,7 +64,7 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putString("id",this.id);
         nbt.putInt("level",this.level);
-        nbt.putInt("duration",this.counter);
+        nbt.putInt("counter",this.counter);
         return nbt;
     }
 
@@ -72,6 +72,6 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
     public void deserializeNBT(CompoundNBT nbt) {
         this.id = nbt.getString("id");
         this.level = nbt.getInt("level");
-        this.counter = nbt.getInt("duration");
+        this.counter = nbt.getInt("counter");
     }
 }

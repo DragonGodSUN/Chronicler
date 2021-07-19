@@ -27,8 +27,12 @@ public class InscriptionHeroCreation implements IInscription {
         if (entity instanceof LivingEntity){
             LivingEntity livingEntity = (LivingEntity) entity;
             EffectInstance heath_boost = livingEntity.getEffect(Effects.HEALTH_BOOST);
-            if (!livingEntity.hasEffect(Effects.HEALTH_BOOST.getEffect())||heath_boost.getDuration()<20||heath_boost.getAmplifier()<2){
-                livingEntity.addEffect(new EffectInstance(Effects.HEALTH_BOOST,100,2+inscription.getLevel()));
+            if (!livingEntity.hasEffect(Effects.HEALTH_BOOST.getEffect())||heath_boost!=null&&heath_boost.getAmplifier()<2){
+                livingEntity.addEffect(new EffectInstance(Effects.HEALTH_BOOST,200,2+inscription.getLevel()));
+            }
+            if (heath_boost!=null && heath_boost.getDuration()<40){
+//                heath_boost.update(new EffectInstance(Effects.HEALTH_BOOST,200,2+inscription.getLevel()));
+                heath_boost.duration=200;
             }
         }
     }
