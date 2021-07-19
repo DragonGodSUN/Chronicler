@@ -58,6 +58,18 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     }
 
     @Override
+    public void resetMax() {
+        this.maxEnergy = 10000;
+        this.setDirty(true);
+    }
+
+    @Override
+    public void reset(){
+        this.energy = 0;
+        this.maxEnergy = 10000;
+        this.setDirty(true);
+    }
+    @Override
     public boolean isDirty() {
         return isDirty;
     }

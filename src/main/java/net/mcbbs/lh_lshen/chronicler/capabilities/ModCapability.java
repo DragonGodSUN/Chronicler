@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities;
 
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
@@ -15,4 +16,7 @@ public class ModCapability {
 
     @CapabilityInject(ICapabilityInscription.class)
     public static Capability<ICapabilityInscription> INSCRIPTION_CAPABILITY;
+
+    @CapabilityInject(ICapabilityEffectPlayer.class)
+    public static Capability<ICapabilityEffectPlayer> EFFECT_PLAYER;
 }

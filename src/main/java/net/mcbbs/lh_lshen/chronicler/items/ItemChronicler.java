@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
@@ -106,12 +107,23 @@ public class ItemChronicler extends Item {
         private void loadInscription(ItemStack off, ItemStack chronicler, World world, PlayerEntity playerEntity){
             if (off.getItem() instanceof ItemInscription){
                 ICapabilityInscription inscription = DataHelper.getInscriptionCapability(chronicler);
+                ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(chronicler);
                 String id = ItemInscription.getInscription(off);
                 int level = ItemInscription.getLevel(off);
-                if (inscription !=null && !id.isEmpty()){
-                    off.shrink(1);
+                if (!id.isEmpty()){
+                    if (!inscription.getInscription().isEmpty()){
+                        ItemStack stack_new = ItemInscription.getSubStack(inscription.getInscription());
+                        if (playerEntity.inventory.getFreeSlot()!=-1) {
+                            playerEntity.inventory.add(stack_new.copy());
+                        }else {
+                            playerEntity.drop(stack_new.copy(),true);
+                        }
+                    }
+                    energy.resetMax();
                     inscription.setInscription(id);
                     inscription.setLevel(level);
+                    DataHelper.synInscriptionPlayerCap(inscription,playerEntity);
+                    off.shrink(1);
                     if (world.isClientSide ) {
                         playerEntity.sendMessage(new StringTextComponent("Load Inscription"+":"+id), UUID.randomUUID());
                         playerEntity.playSound(SoundEvents.GRINDSTONE_USE,1f,1f);

@@ -13,6 +13,8 @@ public interface ICapabilityStellarisEnergy extends INBTSerializable<CompoundNBT
     void cost(int point);
     boolean canCharge();
     boolean canCost(int point);
+    void resetMax();
+    void reset();
     boolean isDirty();
     void setDirty(boolean isDirty);
 }

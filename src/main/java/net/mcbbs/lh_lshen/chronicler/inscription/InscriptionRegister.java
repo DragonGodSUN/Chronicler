@@ -15,6 +15,9 @@ public class InscriptionRegister {
 
     private void registerInscriptions(){
         register(new InscriptionDysonSphere(EnumInscription.DYSON_SPHERE.getId()));
+        register(new InscriptionEternalBlazingSun(EnumInscription.ETERNAL_BLAZING_SUN.getId()));
+        register(new InscriptionDarkMatterDrive(EnumInscription.DARK_MATTER_DRIVE.getId()));
+        register(new InscriptionHeroCreation(EnumInscription.HERO_CREATION.getId()));
     }
     private void register(IInscription inscription){
         if (!inscriptions.contains(inscription)) {

@@ -1,9 +1,13 @@
 package net.mcbbs.lh_lshen.chronicler.helper;
 
 import com.google.common.collect.Lists;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageEnergyCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageInscriptionCapMessage;
 import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemListCapMessage;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -193,8 +197,16 @@ public class StoreHelper {
         return flag;
     }
 
-    public static void synCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
+    public static void synItemListCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
         ChroniclerNetwork.INSTANCE.sendToServer(new ManageItemListCapMessage(chronicler,capabilityItemList));
+    }
+
+    public static void synEnergyCapabilityToSever(ItemStack chronicler, ICapabilityStellarisEnergy energy){
+        ChroniclerNetwork.INSTANCE.sendToServer(new ManageEnergyCapMessage(chronicler,energy));
+    }
+
+    public static void synInscriptionCapabilityToSever(ItemStack chronicler, ICapabilityInscription inscription){
+        ChroniclerNetwork.INSTANCE.sendToServer(new ManageInscriptionCapMessage(chronicler,inscription));
     }
 
 }

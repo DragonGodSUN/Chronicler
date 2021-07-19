@@ -36,9 +36,9 @@ public class ItemRecordPage extends Item {
         if (player.isShiftKeyDown()){
             if (!off.isEmpty() && page.getItem() instanceof ItemRecordPage){
                 ItemStack storeItem = getStoreItem(page);
-                if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler){
+                if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler || off.getItem() instanceof ItemInscription){
                     if (world.isClientSide) {
-                        player.sendMessage(new StringTextComponent("无法记录书页与记录者信息"),UUID.randomUUID());
+                        player.sendMessage(new StringTextComponent("无法记录书页、符文及记录者信息"),UUID.randomUUID());
                     }
                     return ActionResult.fail(page);
                 }else if (!storeItem.isEmpty()){
@@ -49,13 +49,13 @@ public class ItemRecordPage extends Item {
                 }
                 else {
 //                    storeItem(page,off);
-                    page.shrink(1);
                     ItemStack storePage = getPageStored(off.copy());
                     if (player.inventory.canPlaceItem(1,storePage)) {
                         player.inventory.add(storePage);
                     }else {
                         player.drop(storePage,true);
                     }
+                    page.shrink(1);
 
                     if (world.isClientSide) {
                         player.playSound(SoundEvents.PLAYER_LEVELUP,1f,1f);

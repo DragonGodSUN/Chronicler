@@ -7,8 +7,10 @@ import net.mcbbs.lh_lshen.chronicler.events.CommonEventHandler;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotChronicler;
+import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotInscription;
 import net.mcbbs.lh_lshen.chronicler.inventory.gui.SlotStar;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
+import net.mcbbs.lh_lshen.chronicler.items.ItemInscription;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -60,6 +62,7 @@ public class ContainerChronicler extends Container {
         loadInventories();
         addCapabilitySlots();
         addStarSlots();
+        addInscriptionSlots();
         addSelectedSlot();
     }
 
@@ -122,6 +125,20 @@ public class ContainerChronicler extends Container {
         }
     }
 
+    public void addInscriptionSlots(){
+        final int XPOS = 50;
+        final int YPOS = 54;
+        Inventory inventory = new Inventory(1);
+        if (inscription!=null) {
+            ItemStack itemStack = ItemInscription.getSubStack(inscription.getInscription(),inscription.getLevel());
+            inventory.addItem(itemStack);
+            if (!ItemInscription.getInscription(itemStack).isEmpty()) {
+                addSlot(new SlotInscription(inventory,0,XPOS,YPOS,inscription));
+            }
+        }
+
+    }
+
     public void addSelectedSlot(){
         ItemStack selectItem = selectCompnent.selectItemStack;
         Inventory inventory = new Inventory(1);
@@ -139,9 +156,7 @@ public class ContainerChronicler extends Container {
             if (!itemStackSelect.isEmpty()){
                selectCompnent.selectSlot(slot);
                this.selectBoxOpen = true;
-
                this.starTriggered = StoreHelper.isItemStar(cap_list,itemStackSelect);
-
             }else {
                 selectBoxOpen = false;
             }
@@ -255,7 +270,7 @@ public class ContainerChronicler extends Container {
     public void broadcastChanges() {
         if (cap_list.isDirty()) {
             loadSlots();
-            StoreHelper.synCapabilityToSever(this.itemStack,this.cap_list);
+            StoreHelper.synItemListCapabilityToSever(this.itemStack,this.cap_list);
             cap_list.setDirty(false);
         }
         super.broadcastChanges();

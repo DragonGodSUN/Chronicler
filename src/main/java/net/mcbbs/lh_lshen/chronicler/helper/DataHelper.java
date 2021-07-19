@@ -1,15 +1,18 @@
 package net.mcbbs.lh_lshen.chronicler.helper;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynContainerEnergyCapMessage;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.ListNBT;
@@ -30,16 +33,13 @@ public class DataHelper {
         });
     }
 
-    public static void synInscriptionCap(ItemStack itemStack, PlayerEntity player){
-        LazyOptional<ICapabilityInscription> energyLazyOptional = itemStack.getCapability(ModCapability.INSCRIPTION_CAPABILITY,null);
-        energyLazyOptional.ifPresent((inscription)->{
-            if (inscription.isDirty() && player !=null){
-                if (player.containerMenu instanceof ContainerChronicler){
-//                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(energy), (PlayerEntity) player);
-                }
-                inscription.setDirty(false);
-            }
-        });
+    public static void synInscriptionPlayerCap(ICapabilityInscription inscription, PlayerEntity player){
+        ICapabilityEffectPlayer effectPlayer = getEffectPlayerCapability(player);
+        if (inscription!=null){
+            effectPlayer.reset();
+            effectPlayer.setInscription(inscription.getInscription());
+            effectPlayer.setLevel(inscription.getLevel());
+        }
     }
 
     public static CapabilityItemList getItemListCapability(ItemStack itemStack){
@@ -49,6 +49,7 @@ public class DataHelper {
         }
         return (CapabilityItemList) cap_list;
     }
+
     public static CapabilityStellarisEnergy getStellarisEnergyCapability(ItemStack itemStack){
         ICapabilityStellarisEnergy energy = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
         if (energy == null || !(energy instanceof ICapabilityStellarisEnergy)) {
@@ -56,6 +57,7 @@ public class DataHelper {
         }
         return (CapabilityStellarisEnergy) energy;
     }
+
     public static CapabilityInscription getInscriptionCapability(ItemStack itemStack){
         ICapabilityInscription inscription = itemStack.getCapability(ModCapability.INSCRIPTION_CAPABILITY).orElse(null);
         if (inscription == null || !(inscription instanceof ICapabilityInscription)) {
@@ -64,4 +66,11 @@ public class DataHelper {
         return (CapabilityInscription) inscription;
     }
 
+    public static CapabilityEffectPlayer getEffectPlayerCapability(Entity entity){
+        ICapabilityEffectPlayer effectPlayer = entity.getCapability(ModCapability.EFFECT_PLAYER).orElse(null);
+        if (effectPlayer == null || !(effectPlayer instanceof ICapabilityEffectPlayer)) {
+            return new CapabilityEffectPlayer();
+        }
+        return (CapabilityEffectPlayer) effectPlayer;
+    }
 }

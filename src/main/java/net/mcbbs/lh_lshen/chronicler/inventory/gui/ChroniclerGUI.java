@@ -3,12 +3,19 @@ package net.mcbbs.lh_lshen.chronicler.inventory.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
+import net.mcbbs.lh_lshen.chronicler.inscription.EnumInscription;
+import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
+import net.mcbbs.lh_lshen.chronicler.items.ItemInscription;
 import net.mcbbs.lh_lshen.chronicler.items.ItemRecordPage;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.mcbbs.lh_lshen.chronicler.network.packages.ProduceMessage;
@@ -24,6 +31,7 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
 import java.util.UUID;
@@ -347,6 +355,32 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                             }
                         }
                     }
+                    if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotInscription
+                            && this.menu.selectBoxOpen) {
+                        ICapabilityInscription inscription = this.menu.getInscription();
+                        ICapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                        ICapabilityStellarisEnergy energy = this.menu.getEnergy();
+                        SlotInscription selectSlot = (SlotInscription) this.menu.slots.get(selectCompnent.selectSlot);
+                        if (inscription != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
+                            if (!inscription.getInscription().isEmpty()) {
+                                ItemStack stack = selectSlot.getItemInscription();
+                                selectSlot.set(ItemStack.EMPTY);
+                                if (this.getMinecraft().player!=null) {
+                                    this.getMinecraft().player.inventory.add(stack.copy());
+                                }
+                                ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(stack));
+                                energy.resetMax();
+                                inscription.reset();
+                                selectCompnent.setSelectItemStack(ItemStack.EMPTY);
+                                this.menu.starTriggered = false;
+                                synInscription(this.menu.getItemStackChronicler(), (CapabilityInscription) inscription);
+                                synEnergy(this.menu.getItemStackChronicler(), (CapabilityStellarisEnergy) energy);
+                                synData(this.menu.getItemStackChronicler(), (CapabilityItemList) cap_list);
+                            }
+
+                        }
+
+                        }
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("弹出"), x, y), StringTextComponent.EMPTY);
 
@@ -374,14 +408,20 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     ItemStack selectItem = selectCompnent.selectItemStack;
                     ICapabilityStellarisEnergy energy = this.menu.getEnergy();
                     if (selectItem != null && this.menu.selectBoxOpen) {
-                        if (energy.canCost(1000)) {
-                            if (this.getMinecraft().player!=null) {
-                                this.getMinecraft().player.inventory.add(selectItem.copy());
+                        if (!(selectItem.getItem() instanceof ItemInscription)) {
+                            if (energy.canCost(1000)) {
+                                if (this.getMinecraft().player!=null) {
+                                    this.getMinecraft().player.inventory.add(selectItem.copy());
+                                }
+                                ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
+                            }else {
+                                if (this.getMinecraft().player!=null) {
+                                    this.getMinecraft().player.sendMessage(new StringTextComponent("星能不足"), UUID.randomUUID());
+                                }
                             }
-                            ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
                         }else {
                             if (this.getMinecraft().player!=null) {
-                                this.getMinecraft().player.sendMessage(new StringTextComponent("星能不足"), UUID.randomUUID());
+                                this.getMinecraft().player.sendMessage(new StringTextComponent("无法生成符文"), UUID.randomUUID());
                             }
                         }
                     }
@@ -526,4 +566,15 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         this.menu.setCapabilityItemList(capabilityItemList);
         this.menu.broadcastChanges();
     }
+
+    public void synEnergy(ItemStack chronicler, CapabilityStellarisEnergy energy){
+        this.menu.setEnergy(energy);
+        StoreHelper.synEnergyCapabilityToSever(chronicler,energy);
+    }
+
+    public void synInscription(ItemStack chronicler, CapabilityInscription inscription){
+        this.menu.setInscription(inscription);
+        StoreHelper.synInscriptionCapabilityToSever(chronicler,inscription);
+    }
+
 }
