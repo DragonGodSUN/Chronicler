@@ -56,7 +56,6 @@ public class ManageInscriptionCapMessage {
                     ICapabilityInscription inscription = hold.getCapability(ModCapability.INSCRIPTION_CAPABILITY).orElse(null);
                     if (cap!=null && inscription!=null){
                         inscription.deserializeNBT(cap.serializeNBT());
-                        DataHelper.synInscriptionPlayerCap(cap,sender);
                     }
                 }
 

@@ -122,7 +122,6 @@ public class ItemChronicler extends Item {
                     energy.resetMax();
                     inscription.setInscription(id);
                     inscription.setLevel(level);
-                    DataHelper.synInscriptionPlayerCap(inscription,playerEntity);
                     off.shrink(1);
                     if (world.isClientSide ) {
                         playerEntity.sendMessage(new StringTextComponent("Load Inscription"+":"+id), UUID.randomUUID());

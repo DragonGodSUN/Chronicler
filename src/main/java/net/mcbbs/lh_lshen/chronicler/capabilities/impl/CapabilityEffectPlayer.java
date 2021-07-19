@@ -1,21 +1,20 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
-import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.minecraft.nbt.CompoundNBT;
 
 public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
     private String id = "";
     private int level;
-    private int duration;
+    private int counter;
     private boolean isDirty;
     @Override
-    public String getInscription() {
+    public String getType() {
         return id;
     }
 
     @Override
-    public void setInscription(String id) {
+    public void setType(String id) {
         this.id = id;
         setDirty(true);
     }
@@ -32,13 +31,13 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
     }
 
     @Override
-    public int getDuration() {
-        return duration;
+    public int getCounter() {
+        return counter;
     }
 
     @Override
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public void setCounter(int counter) {
+        this.counter = counter;
         setDirty(true);
     }
 
@@ -46,7 +45,7 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
     public void reset() {
         this.id = "";
         this.level = 0;
-        this.duration = 0;
+        this.counter = 0;
         setDirty(true);
     }
 
@@ -65,7 +64,7 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
         CompoundNBT nbt = new CompoundNBT();
         nbt.putString("id",this.id);
         nbt.putInt("level",this.level);
-        nbt.putInt("duration",this.duration);
+        nbt.putInt("duration",this.counter);
         return nbt;
     }
 
@@ -73,6 +72,6 @@ public class CapabilityEffectPlayer implements ICapabilityEffectPlayer {
     public void deserializeNBT(CompoundNBT nbt) {
         this.id = nbt.getString("id");
         this.level = nbt.getInt("level");
-        this.duration = nbt.getInt("duration");
+        this.counter = nbt.getInt("duration");
     }
 }

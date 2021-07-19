@@ -14,5 +14,6 @@ import javax.annotation.Nullable;
 public class Chronicler {
     public Chronicler() {
         ItemRegistry.ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        EffectRegistry.EFFECTS.register(FMLJavaModLoadingContext.get().getModEventBus());
     }
 }

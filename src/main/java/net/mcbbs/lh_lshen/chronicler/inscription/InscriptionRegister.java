@@ -18,6 +18,7 @@ public class InscriptionRegister {
         register(new InscriptionEternalBlazingSun(EnumInscription.ETERNAL_BLAZING_SUN.getId()));
         register(new InscriptionDarkMatterDrive(EnumInscription.DARK_MATTER_DRIVE.getId()));
         register(new InscriptionHeroCreation(EnumInscription.HERO_CREATION.getId()));
+        register(new InscriptionHopeFlower(EnumInscription.HOPE_FLOWER.getId()));
     }
     private void register(IInscription inscription){
         if (!inscriptions.contains(inscription)) {

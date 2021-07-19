@@ -15,7 +15,6 @@ import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynContainerEnerg
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class DataHelper {
@@ -37,7 +36,7 @@ public class DataHelper {
         ICapabilityEffectPlayer effectPlayer = getEffectPlayerCapability(player);
         if (inscription!=null){
             effectPlayer.reset();
-            effectPlayer.setInscription(inscription.getInscription());
+            effectPlayer.setType(inscription.getInscription());
             effectPlayer.setLevel(inscription.getLevel());
         }
     }
