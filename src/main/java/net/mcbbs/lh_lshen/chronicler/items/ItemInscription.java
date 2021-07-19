@@ -1,8 +1,10 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
+import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.inscription.EnumInscription;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -67,6 +69,10 @@ public class ItemInscription extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> textComponents, ITooltipFlag flag) {
         super.appendHoverText(itemStack, world, textComponents, flag);
-        textComponents.add(new StringTextComponent("Inscription: "+(getInscription(itemStack))));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.inscription") + I18n.get(getKey(getInscription(itemStack)))));
+    }
+
+    public static String getKey(String text){
+        return "tooltip"+"."+ Utils.MOD_ID+"."+"inscription"+"."+text;
     }
 }

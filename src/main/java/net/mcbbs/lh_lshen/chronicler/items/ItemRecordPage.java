@@ -3,6 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.items;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -25,9 +26,10 @@ public class ItemRecordPage extends Item {
         super.appendHoverText(itemStack, world, textComponents, flag);
         ItemStack stack = getStoreItem(itemStack);
         boolean isStoreItem = !stack.isEmpty();
-        textComponents.add(new StringTextComponent("状态"+":"+(isStoreItem?"§b已储存":"未储存")));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.record_page.condition")
+                +(isStoreItem?I18n.get("tooltip.chronicler_lh.record_page.condition.stored"):I18n.get("tooltip.chronicler_lh.record_page.condition.empty"))));
         if (isStoreItem){
-            textComponents.add(new StringTextComponent("储存"+":"+stack.getDisplayName().getString()));
+            textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.record_page.store")+stack.getDisplayName().getString()));
         }
     }
 

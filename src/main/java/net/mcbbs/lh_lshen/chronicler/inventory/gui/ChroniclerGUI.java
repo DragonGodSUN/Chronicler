@@ -31,6 +31,7 @@ import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         synData(chronicler,cap_list);
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("上一页"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.page.up"), x, y), StringTextComponent.EMPTY);
 
         ImageButton pageDown = new ImageButton(leftPos + 229, topPos + 162, 12, 9, 33, 0, 25, BUTTON, 256, 256,
                 (button) -> {
@@ -87,13 +88,13 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         synData(chronicler,cap_list);
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("下一页"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.page.down"), x, y), StringTextComponent.EMPTY);
 
         ImageButton bookClose = new ImageButton(leftPos + 237, topPos + 5, 10, 10, 174, 0, 26, BUTTON, 256, 256,
                 (button) -> {
                     this.onClose();
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("关闭"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.close"), x, y), StringTextComponent.EMPTY);
 
         addButton(pageUp);
         addButton(pageDown);
@@ -123,7 +124,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 }
                             }
                         }
-                    }, (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("back"), x, y), StringTextComponent.EMPTY);
+                    }, (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.list.back"), x, y), StringTextComponent.EMPTY);
 
             ImageButton next = new ImageButton(leftPos + X_POS + X_SPACING, topPos + Y_POS + j*Y_SPACING, 9, 11, 11, 0, 24, BUTTON, 256, 256,
                     (button) -> {
@@ -142,7 +143,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                             }
                         }
                     },
-                    (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("next"), x, y), StringTextComponent.EMPTY);
+                    (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.list.next"), x, y), StringTextComponent.EMPTY);
 
             addButton(back);
             addButton(next);
@@ -181,7 +182,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         }
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("排序左移"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.left"), x, y), StringTextComponent.EMPTY);
 
         ImageButton indexDown = new ImageButton(leftPos + 69, topPos + 116, 6, 10, 161, 3, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -210,7 +211,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         }
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("排序右移"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.right"), x, y), StringTextComponent.EMPTY);
 
         ImageButton indexFirst = new ImageButton(leftPos + 61, topPos + 91, 16, 16, 110, 0, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -232,7 +233,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         }
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("设为首位"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.first"), x, y), StringTextComponent.EMPTY);
 
         ImageButton listUp = new ImageButton(leftPos + 42, topPos + 115, 10, 6, 134, 50, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -279,7 +280,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     }
 
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("序列上升"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.up"), x, y), StringTextComponent.EMPTY);
 
         ImageButton listDown = new ImageButton(leftPos + 42, topPos + 121, 10, 6, 156, 56, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -329,7 +330,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         }
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("序列下降"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.down"), x, y), StringTextComponent.EMPTY);
 
         ImageButton pop = new ImageButton(leftPos + 39, topPos + 134, 16, 16, 189, 0, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -382,7 +383,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
 
                         }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("弹出"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.pop"), x, y), StringTextComponent.EMPTY);
 
         ImageButton reset = new ImageButton(leftPos + 61, topPos + 134, 16, 16, 210, 0, 24, BUTTON, 256, 256,
                 (button) -> {
@@ -398,7 +399,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
 
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("重置"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.operation.reset"), x, y), StringTextComponent.EMPTY);
 
 
         ImageButton produce = new ImageButton(leftPos + 111, topPos + 158, 34, 15, 49, 0, 24, BUTTON, 256, 256,
@@ -416,17 +417,17 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(selectItem));
                             }else {
                                 if (this.getMinecraft().player!=null) {
-                                    this.getMinecraft().player.sendMessage(new StringTextComponent("星能不足"), UUID.randomUUID());
+                                    this.getMinecraft().player.sendMessage(new TranslationTextComponent("message.chronicler.gui.energy.deficiency"), UUID.randomUUID());
                                 }
                             }
                         }else {
                             if (this.getMinecraft().player!=null) {
-                                this.getMinecraft().player.sendMessage(new StringTextComponent("无法生成符文"), UUID.randomUUID());
+                                this.getMinecraft().player.sendMessage(new TranslationTextComponent("message.chronicler.gui.produce.inscription"), UUID.randomUUID());
                             }
                         }
                     }
                 },
-                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new StringTextComponent("生成"), x, y), StringTextComponent.EMPTY);
+                (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("message.chronicler.gui.produce"), x, y), StringTextComponent.EMPTY);
 
         this.star = new ToggleWidget(leftPos + 39, topPos + 91, 16, 16, false);
         star.initTextureValues(0, 48, 18, 24, BUTTON);

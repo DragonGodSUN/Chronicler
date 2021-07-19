@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
@@ -13,6 +14,7 @@ import net.mcbbs.lh_lshen.chronicler.inscription.IInscription;
 import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,6 +32,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -124,7 +127,7 @@ public class ItemChronicler extends Item {
                     inscription.setLevel(level);
                     off.shrink(1);
                     if (world.isClientSide ) {
-                        playerEntity.sendMessage(new StringTextComponent("Load Inscription"+":"+id), UUID.randomUUID());
+                        playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.inscription.load", I18n.get(ItemInscription.getKey(id))), UUID.randomUUID());
                         playerEntity.playSound(SoundEvents.GRINDSTONE_USE,1f,1f);
                     }
                 }
@@ -138,7 +141,7 @@ public class ItemChronicler extends Item {
                 StoreHelper.addItemStack(cap_list,storeItem);
                 off.shrink(1);
                 if (world.isClientSide ) {
-                    playerEntity.sendMessage(new StringTextComponent("储存"+":"+storeItem.getDisplayName().getString()), UUID.randomUUID());
+                    playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.item_list.store",storeItem.getDisplayName().getString()), UUID.randomUUID());
                     playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
                 }
             }

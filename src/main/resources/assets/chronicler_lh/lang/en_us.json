@@ -1,3 +1,43 @@
 {
-  "item.chronicler_lh.chronicle": "Chronicle"
+  "item.chronicler_lh.chronicle": "§b§lChronicle:he Key of Stellaris",
+  "item.chronicler_lh.record_page": "§e§lRecord Page",
+  "item.chronicler_lh.recorder": "Recorder",
+  "item.chronicler_lh.inscription": "§7§lInscription",
+
+  "message.chronicler_lh.chronicler.inscription.load": "Inscription Load:%s",
+  "message.chronicler_lh.chronicler.item_list.store": "Store:%s",
+  "message.chronicler_lh.recorder.fail.item":"Unable to record information of page, inscription, or chronicler",
+
+  "tooltip.chronicler_lh.record_page.condition": "Condition:",
+  "tooltip.chronicler_lh.record_page.condition.stored": "Stored",
+  "tooltip.chronicler_lh.record_page.condition.empty": "Empty",
+  "tooltip.chronicler_lh.record_page.store": "Store:",
+  "tooltip.chronicler_lh.recorder.type": "Type:",
+  "tooltip.chronicler_lh.recorder.type.common": "§b§lCommon",
+  "tooltip.chronicler_lh.recorder.type.super": "§d§lSuper",
+  "tooltip.chronicler_lh.recorder.type.lord": "§e§lLord",
+  "tooltip.chronicler_lh.recorder.chance": "Chance:",
+  "tooltip.chronicler_lh.inscription": "Load:",
+  "tooltip.chronicler_lh.inscription.dyson_sphere":"§bDyson Sphere",
+  "tooltip.chronicler_lh.inscription.eternal_blazing_sun":"§6Eternal Blazing Sun",
+  "tooltip.chronicler_lh.inscription.dark_matter_drive":"§8Dark Matter Drive",
+  "tooltip.chronicler_lh.inscription.hope_flower":"§4Hope Flower",
+  "tooltip.chronicler_lh.inscription.hero_creation":"§cHero Creation",
+
+  "gui.chronicler_lh.page.up": "Page Up",
+  "gui.chronicler_lh.page.down": "Page Down",
+  "gui.chronicler_lh.close": "Close",
+  "gui.chronicler_lh.list.back": "Back",
+  "gui.chronicler_lh.list.next": "Next",
+  "gui.chronicler_lh.operation.left": "Move Left",
+  "gui.chronicler_lh.operation.right": "Move Right",
+  "gui.chronicler_lh.operation.first": "Set First",
+  "gui.chronicler_lh.operation.up": "Move Up",
+  "gui.chronicler_lh.operation.down": "Move Down",
+  "gui.chronicler_lh.operation.pop": "Pop",
+  "gui.chronicler_lh.operation.reset": "Reset",
+  "message.chronicler.gui.energy.deficiency": "Stellasris Energy is not enough",
+  "message.chronicler.gui.produce.inscription": "The Inscription can't be produced",
+  "message.chronicler.gui.produce": "Create"
+
 }

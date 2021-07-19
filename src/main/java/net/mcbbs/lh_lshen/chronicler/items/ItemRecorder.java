@@ -3,6 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.items;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +18,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -37,7 +39,7 @@ public class ItemRecorder extends Item {
             if (!off.isEmpty() && base.getItem() instanceof ItemRecorder){
                 if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler || off.getItem() instanceof ItemInscription){
                     if (world.isClientSide) {
-                        player.sendMessage(new StringTextComponent("无法记录书页、刻印及记录者信息"), UUID.randomUUID());
+                        player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.item"), UUID.randomUUID());
                     }
                     return ActionResult.fail(base);
                 } else {
@@ -67,8 +69,8 @@ public class ItemRecorder extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> textComponents, ITooltipFlag flag) {
         super.appendHoverText(itemStack, world, textComponents, flag);
-        textComponents.add(new StringTextComponent("类型"+":"+"§b"+getType(itemStack)));
-        textComponents.add(new StringTextComponent("成功率"+":"+"§e"+getChance(itemStack)+"%"));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.recorder.type") +I18n.get("tooltip.chronicler_lh.recorder.type."+getType(itemStack))));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.recorder.chance")+"§e"+getChance(itemStack)+"%"));
     }
 
     @Override
