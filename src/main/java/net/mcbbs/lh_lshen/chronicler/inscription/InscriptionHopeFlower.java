@@ -10,6 +10,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.text.TranslationTextComponent;
+
+import java.util.UUID;
 
 public class InscriptionHopeFlower implements IInscription {
     private String id;
@@ -32,6 +35,7 @@ public class InscriptionHopeFlower implements IInscription {
             if (playerEntity.getMainHandItem().equals(chronicler,false)
                 &&!effectPlayer.getType().equals(inscription.getInscription())){
                 DataHelper.synInscriptionPlayerCap(inscription,playerEntity);
+                playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.inscription.hope_flower.load"), UUID.randomUUID());
             }
         }
     }

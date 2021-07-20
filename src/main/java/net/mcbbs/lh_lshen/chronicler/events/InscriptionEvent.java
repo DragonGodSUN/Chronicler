@@ -11,11 +11,14 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.UUID;
 
 @Mod.EventBusSubscriber()
 public class InscriptionEvent {
@@ -78,6 +81,7 @@ public class InscriptionEvent {
             if (effectPlayer.getType().equals(EnumInscription.HOPE_FLOWER.getId())){
                 if (!playerEntity.hasEffect(EffectRegistry.hope_flower.get())){
                     playerEntity.addEffect(new EffectInstance(EffectRegistry.hope_flower.get(),600));
+                    playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.inscription.hope_flower.damage",0), UUID.randomUUID());
                 }
                 if (!playerEntity.hasEffect(EffectRegistry.hope_flower.get())
                     || playerEntity.hasEffect(EffectRegistry.hope_flower.get())
@@ -97,7 +101,9 @@ public class InscriptionEvent {
             ICapabilityEffectPlayer effectPlayer = DataHelper.getEffectPlayerCapability(playerEntity);
             if (effectPlayer.getType().equals(EnumInscription.HOPE_FLOWER.getId())){
                 if (playerEntity.hasEffect(EffectRegistry.hope_flower.get())) {
-                    effectPlayer.setCounter((int) (effectPlayer.getCounter()+event.getAmount()));
+                    int damage_store = (int) (effectPlayer.getCounter()+event.getAmount());
+                    effectPlayer.setCounter((damage_store));
+                    playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.inscription.hope_flower.damage",damage_store), UUID.randomUUID());
                 }
             }
         }

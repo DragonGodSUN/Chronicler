@@ -8,6 +8,11 @@
   "message.chronicler_lh.chronicler.inscription.load": "Inscription Load:%s",
   "message.chronicler_lh.chronicler.item_list.store": "Store:%s",
   "message.chronicler_lh.recorder.fail.item":"Unable to record information of page, inscription, or chronicler",
+  "message.chronicler_lh.inscription.hope_flower.load": "Colonel! The car is ready!",
+  "message.chronicler.gui.energy.deficiency": "Stellasris Energy is not enough",
+  "message.chronicler.gui.produce.inscription": "The Inscription can't be produced",
+  "message.chronicler.gui.produce": "Create",
+  "message.chronicler_lh.inscription.hope_flower.damage": "Extra Damage Stored:10+%s",
 
   "tooltip.chronicler_lh.record_page.condition": "Condition:",
   "tooltip.chronicler_lh.record_page.condition.stored": "Stored",
@@ -37,8 +42,11 @@
   "gui.chronicler_lh.operation.down": "Move Down",
   "gui.chronicler_lh.operation.pop": "Pop",
   "gui.chronicler_lh.operation.reset": "Reset",
-  "message.chronicler.gui.energy.deficiency": "Stellasris Energy is not enough",
-  "message.chronicler.gui.produce.inscription": "The Inscription can't be produced",
-  "message.chronicler.gui.produce": "Create"
+
+  "effect.chronicler_lh.hope_flower": "Hope Flower",
+
+  "death.attack.cannotStop": "%s can't stop",
+  "death.attack.cannotStop.player": "%s can't stop"
+
 
 }
