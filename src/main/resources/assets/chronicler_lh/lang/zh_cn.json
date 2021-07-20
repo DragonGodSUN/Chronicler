@@ -1,5 +1,6 @@
 {
-  "item.chronicler_lh.chronicle": "§b§l历史记录官:星之匙",
+  "itemGroup.chronicler_lh.chronicler": "历史记录者:星之匙",
+  "item.chronicler_lh.chronicler": "§b§l历史记录者：星之匙",
   "item.chronicler_lh.record_page": "§e§l记录书页",
   "item.chronicler_lh.recorder": "记录笔记",
   "item.chronicler_lh.inscription": "§7§l刻印",

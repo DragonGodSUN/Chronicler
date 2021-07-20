@@ -1,5 +1,6 @@
 {
-  "item.chronicler_lh.chronicle": "§b§lChronicle:he Key of Stellaris",
+  "itemGroup.chronicler_lh.chronicler": "Chronicler:The Key of Stellaris",
+  "item.chronicler_lh.chronicler": "§b§lChronicler:The Encyclopedia of Stellaris",
   "item.chronicler_lh.record_page": "§e§lRecord Page",
   "item.chronicler_lh.recorder": "Recorder",
   "item.chronicler_lh.inscription": "§7§lInscription",

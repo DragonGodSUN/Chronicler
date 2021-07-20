@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Utils.MOD_ID);
-    public static final RegistryObject<Item> chronicle = ITEMS.register("chronicle", ItemChronicler::new);
+    public static final RegistryObject<Item> chronicler = ITEMS.register("chronicler", ItemChronicler::new);
     public static final RegistryObject<Item> recordPage = ITEMS.register("record_page", ItemRecordPage::new);
     public static final RegistryObject<Item> recorder = ITEMS.register("recorder", ItemRecorder::new);
     public static final RegistryObject<Item> inscription = ITEMS.register("inscription", ItemInscription::new);

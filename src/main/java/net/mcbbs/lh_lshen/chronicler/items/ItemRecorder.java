@@ -37,7 +37,8 @@ public class ItemRecorder extends Item {
         ItemStack base = player.getMainHandItem();
         if (player.isShiftKeyDown()){
             if (!off.isEmpty() && base.getItem() instanceof ItemRecorder){
-                if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler || off.getItem() instanceof ItemInscription){
+                if (off.getItem() instanceof ItemRecordPage || off.getItem() instanceof ItemChronicler
+                        || off.getItem() instanceof ItemInscription || off.getItem() instanceof ItemRecorder){
                     if (world.isClientSide) {
                         player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.item"), UUID.randomUUID());
                     }

@@ -2,6 +2,8 @@ package net.mcbbs.lh_lshen.chronicler.items;
 
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.Utils;
+import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
+import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.inscription.EnumInscription;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
 import net.minecraft.client.resources.I18n;
@@ -13,6 +15,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -30,6 +33,15 @@ public class ItemInscription extends Item {
              subItems.add(getSubStack(e.getId()));
             }
         }
+    }
+
+    @Override
+    public ITextComponent getName(ItemStack itemStack) {
+        ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
+        if (!inscription.getInscription().isEmpty()) {
+            return new StringTextComponent(super.getName(itemStack).getString()+"-"+I18n.get(getKey(inscription.getInscription())));
+        }
+        return super.getName(itemStack);
     }
 
     public static String getInscription(ItemStack itemStack) {

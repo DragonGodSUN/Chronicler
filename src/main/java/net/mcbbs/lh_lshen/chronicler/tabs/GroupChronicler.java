@@ -11,6 +11,6 @@ public class GroupChronicler extends ItemGroup {
 
     @Override
     public ItemStack makeIcon() {
-        return new ItemStack(ItemRegistry.chronicle.get());
+        return new ItemStack(ItemRegistry.chronicler.get());
     }
 }
