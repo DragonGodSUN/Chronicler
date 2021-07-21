@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "chronicler_lh:item/recorder_common"
+  }
+}

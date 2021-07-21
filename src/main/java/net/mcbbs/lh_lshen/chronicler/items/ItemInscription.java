@@ -37,12 +37,13 @@ public class ItemInscription extends Item {
 
     @Override
     public ITextComponent getName(ItemStack itemStack) {
-        ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
-        if (!inscription.getInscription().isEmpty()) {
-            return new StringTextComponent(super.getName(itemStack).getString()+"-"+I18n.get(getKey(inscription.getInscription())));
-        }
+//        String type = getInscription(itemStack);
+//        if (!type.isEmpty()) {
+//            return new StringTextComponent(super.getName(itemStack).getString()+" "+I18n.get(getKey(type)));
+//        }
         return super.getName(itemStack);
     }
+
 
     public static String getInscription(ItemStack itemStack) {
         CompoundNBT compoundNBT = itemStack.getOrCreateTag();

@@ -1,6 +1,26 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "minecraft:item/writable_book"
-  }
+    "layer0": "chronicler_lh:item/recorder_common"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "type": 0
+      },
+      "model": "chronicler_lh:item/recorder_common"
+    },
+    {
+      "predicate": {
+        "type": 1
+      },
+      "model": "chronicler_lh:item/recorder_super"
+    },
+    {
+      "predicate": {
+        "type": 2
+      },
+      "model": "chronicler_lh:item/recorder_lord"
+    }
+  ]
 }
