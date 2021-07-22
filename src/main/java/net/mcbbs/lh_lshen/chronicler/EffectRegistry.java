@@ -1,7 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler;
 
-import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
-import net.minecraft.item.Item;
+import net.mcbbs.lh_lshen.chronicler.effects.EffectHopeFlower;
 import net.minecraft.potion.Effect;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

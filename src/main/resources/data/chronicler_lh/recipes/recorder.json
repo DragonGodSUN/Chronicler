@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DLD",
+    "L#L",
+    "DLD"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:book"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "L": {
+      "item": "minecraft:lapis_block"
+    }
+  },
+  "result": {
+    "type": "minecraft:item_nbt",
+    "item": "chronicler_lh:recorder",
+    "nbt": {
+        "type": "common",
+        "chance": 10
+    }
+  }
+}

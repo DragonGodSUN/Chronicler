@@ -21,6 +21,7 @@ import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.mcbbs.lh_lshen.chronicler.items.ItemInscription;
+import net.mcbbs.lh_lshen.chronicler.loot.LootTableLoader;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -52,6 +53,7 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(ChroniclerNetwork::registerMessage);
+        event.enqueueWork(LootTableLoader::new);
         event.enqueueWork(InscriptionRegister::new);
     }
 

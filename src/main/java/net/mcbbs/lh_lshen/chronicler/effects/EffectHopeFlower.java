@@ -1,4 +1,4 @@
-package net.mcbbs.lh_lshen.chronicler;
+package net.mcbbs.lh_lshen.chronicler.effects;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EffectHopeFlower extends Effect {
-    protected EffectHopeFlower() {
+    public EffectHopeFlower() {
         super(EffectType.NEUTRAL, 16720896);
     }
 
