@@ -25,7 +25,7 @@ public class LootNBTRandomFunction extends LootFunction {
     protected ItemStack run(ItemStack stack, LootContext context) {
         List<IInscription> inscriptions = InscriptionRegister.inscriptions;
         if (inscriptions.size()>0) {
-        int i = MathHelper.nextInt(new Random(),0,inscriptions.size());
+        int i = MathHelper.nextInt(new Random(),0,inscriptions.size()-1);
             ItemStack new_stack = ItemInscription.getSubStack(inscriptions.get(i).getId());
             return new_stack;
         }
@@ -47,7 +47,7 @@ public class LootNBTRandomFunction extends LootFunction {
 
         @Override
         public LootNBTRandomFunction deserialize(JsonObject jsonObject, JsonDeserializationContext context, ILootCondition[] conditions) {
-            return null;
+            return new LootNBTRandomFunction(conditions);
         }
     }
 }

@@ -53,8 +53,10 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(ChroniclerNetwork::registerMessage);
-        event.enqueueWork(LootTableLoader::new);
-        event.enqueueWork(InscriptionRegister::new);
+        event.enqueueWork(()->{
+                new InscriptionRegister();
+                new LootTableLoader();
+        });
     }
 
     @SubscribeEvent

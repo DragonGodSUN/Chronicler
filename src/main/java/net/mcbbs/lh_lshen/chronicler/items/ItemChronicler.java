@@ -114,7 +114,7 @@ public class ItemChronicler extends Item {
                 String id = ItemInscription.getInscription(off);
                 int level = ItemInscription.getLevel(off);
                 if (!id.isEmpty()){
-                    if (!inscription.getInscription().isEmpty()){
+                    if (!inscription.getInscription().isEmpty() && !playerEntity.level.isClientSide()){
                         ItemStack stack_new = ItemInscription.getSubStack(inscription.getInscription());
                         if (playerEntity.inventory.getFreeSlot()!=-1) {
                             playerEntity.inventory.add(stack_new.copy());
@@ -138,11 +138,15 @@ public class ItemChronicler extends Item {
         if (off.getItem() instanceof ItemRecordPage){
             ItemStack storeItem = ((ItemRecordPage) off.getItem()).getStoreItem(off);
             if (!storeItem.isEmpty()){
-                StoreHelper.addItemStack(cap_list,storeItem);
-                off.shrink(1);
-                if (world.isClientSide ) {
+                if (!StoreHelper.hasItemStack(cap_list,storeItem)) {
+                    if (!world.isClientSide) {
+                        StoreHelper.addItemStack(cap_list,storeItem);
+                        off.shrink(1);
+                    }
+                    if (world.isClientSide ) {
                     playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.item_list.store",storeItem.getDisplayName().getString()), UUID.randomUUID());
                     playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
+                    }
                 }
             }
         }

@@ -31,15 +31,9 @@ public final class CapabilityEvent {
     public static void onAttachItemStackCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {
         ItemStack itemStack = event.getObject();
         if (itemStack.getItem() instanceof ItemChronicler) {
-            if (ModCapability.ITEMLIST_CAPABILITY!=null) {
-                event.addCapability(new ResourceLocation(Utils.MOD_ID, "item_list"), new ItemListProvider());
-            }
-            if (ModCapability.ENERGY_CAPABILITY!=null) {
-                event.addCapability(new ResourceLocation(Utils.MOD_ID, "stellaris_energy"), new StellarisEnergyProvider());
-            }
-            if (ModCapability.INSCRIPTION_CAPABILITY!=null) {
-                event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription"), new InscriptionProvider());
-            }
+            event.addCapability(new ResourceLocation(Utils.MOD_ID, "item_list"), new ItemListProvider());
+            event.addCapability(new ResourceLocation(Utils.MOD_ID, "stellaris_energy"), new StellarisEnergyProvider());
+            event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription"), new InscriptionProvider());
         }
     }
 
@@ -47,9 +41,7 @@ public final class CapabilityEvent {
     public static void onAttachEntityCapabilityEvent(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
         if (entity instanceof PlayerEntity) {
-            if (ModCapability.EFFECT_PLAYER!=null) {
-                event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription_effect"), new EffectPlayerProvider());
-            }
+            event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription_effect"), new EffectPlayerProvider());
         }
     }
 //

@@ -59,6 +59,7 @@ public class ItemRecorder extends Item {
                             server_player.playNotifySound(SoundEvents.ITEM_BREAK, SoundCategory.PLAYERS,1f,1f);
                         }
                     }
+                    off.shrink(1);
                     base.shrink(1);
                     return ActionResult.success(base);
                 }
