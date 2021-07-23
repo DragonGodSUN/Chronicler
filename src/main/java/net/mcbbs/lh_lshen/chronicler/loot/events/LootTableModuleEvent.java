@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+//感谢LocusAzzurro提供的关于loottable的技术支持
 @Mod.EventBusSubscriber(modid = Utils.MOD_ID)
 public class LootTableModuleEvent {
     @SubscribeEvent

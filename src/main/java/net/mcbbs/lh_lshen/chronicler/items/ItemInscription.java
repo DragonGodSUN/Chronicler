@@ -1,11 +1,16 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import com.sun.jna.platform.win32.WinUser;
+import cpw.mods.modlauncher.api.IEnvironment;
+import net.java.games.input.Controller;
+import net.java.games.input.Keyboard;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.inscription.EnumInscription;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.KeyboardListener;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -19,6 +24,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.util.List;
 
 public class ItemInscription extends Item {
@@ -83,6 +89,8 @@ public class ItemInscription extends Item {
     public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> textComponents, ITooltipFlag flag) {
         super.appendHoverText(itemStack, world, textComponents, flag);
         textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.inscription") + I18n.get(getKey(getInscription(itemStack)))));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.inscription.info") + I18n.get("tooltip.chronicler_lh.inscription.info"+"."+getInscription(itemStack))));
+
     }
 
     public static String getKey(String text){

@@ -73,6 +73,7 @@ public class ItemRecorder extends Item {
         super.appendHoverText(itemStack, world, textComponents, flag);
         textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.recorder.type") +I18n.get("tooltip.chronicler_lh.recorder.type."+getType(itemStack))));
         textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.recorder.chance")+"§e"+getChance(itemStack)+"%"));
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.recorder.info")));
     }
 
     @Override

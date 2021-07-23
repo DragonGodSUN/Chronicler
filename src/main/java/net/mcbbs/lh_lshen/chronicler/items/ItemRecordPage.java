@@ -31,6 +31,7 @@ public class ItemRecordPage extends Item {
         if (isStoreItem){
             textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.record_page.store")+stack.getDisplayName().getString()));
         }
+        textComponents.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.record_page.info")));
     }
 
     public ItemStack getStoreItem(ItemStack stack){
