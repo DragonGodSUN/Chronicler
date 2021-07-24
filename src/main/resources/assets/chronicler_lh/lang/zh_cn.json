@@ -17,7 +17,7 @@
   "tooltip.chronicler_lh.record_page.condition": "状态:",
   "tooltip.chronicler_lh.record_page.condition.stored": "已储存",
   "tooltip.chronicler_lh.record_page.condition.empty": "空",
-  "tooltip.chronicler_lh.record_page.info": "§8主手持有历史记录者，潜行并右击以导入信息",
+  "tooltip.chronicler_lh.record_page.info": "§7主手持有历史记录者，潜行并右击以导入信息",
 
   "tooltip.chronicler_lh.record_page.store": "储存:",
   "tooltip.chronicler_lh.recorder.type": "类型:",
@@ -25,7 +25,7 @@
   "tooltip.chronicler_lh.recorder.type.super": "§d§l卓越",
   "tooltip.chronicler_lh.recorder.type.lord": "§e§l主宰",
   "tooltip.chronicler_lh.recorder.chance": "成功率:",
-  "tooltip.chronicler_lh.recorder.info": "§8副手持有物品，潜行并右击以记录信息 §e§l(警告：原物品将会被摧毁)",
+  "tooltip.chronicler_lh.recorder.info": "§7副手持有物品，潜行并右击以记录信息 §e§l(警告：原物品将会被摧毁)",
 
   "tooltip.chronicler_lh.inscription": "类型:",
   "tooltip.chronicler_lh.inscription.dyson_sphere":"§b§l戴森球",

@@ -24,8 +24,9 @@ public class StoreHelper {
             if (allMap.containsKey(item_reg_id)){
                 List<ItemStack> stackList = allMap.get(item_reg_id);
                 for (ItemStack s : stackList) {
-                    itemStack.equals(s,false);
+                    if (itemStack.equals(s,false)) {
                     return true;
+                    }
                 }
                 return false;
             }

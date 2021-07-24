@@ -1,20 +1,14 @@
 package net.mcbbs.lh_lshen.chronicler.loot.modifier;
 
 import com.google.gson.JsonObject;
-import com.sun.istack.internal.NotNull;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipe;
-import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
-import net.minecraftforge.items.ItemHandlerHelper;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 public class LootRandomNBTModifier extends net.minecraftforge.common.loot.LootModifier {
     /**
@@ -26,7 +20,6 @@ public class LootRandomNBTModifier extends net.minecraftforge.common.loot.LootMo
         super(conditionsIn);
     }
 
-    @NotNull
     @Override
     protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
 //        List<ItemStack> newLoot = new ArrayList<>();

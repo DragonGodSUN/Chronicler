@@ -18,14 +18,14 @@
   "tooltip.chronicler_lh.record_page.condition.stored": "Stored",
   "tooltip.chronicler_lh.record_page.condition.empty": "Empty",
   "tooltip.chronicler_lh.record_page.store": "Store:",
-  "tooltip.chronicler_lh.record_page.info": "§8With the Chronicler in the main hand, holding Shift and right click to insert this page",
+  "tooltip.chronicler_lh.record_page.info": "§7With the Chronicler in the main hand, holding Shift and right click to insert this page",
 
   "tooltip.chronicler_lh.recorder.type": "Type:",
   "tooltip.chronicler_lh.recorder.type.common": "§b§lCommon",
   "tooltip.chronicler_lh.recorder.type.super": "§d§lSuper",
   "tooltip.chronicler_lh.recorder.type.lord": "§e§lLord",
   "tooltip.chronicler_lh.recorder.chance": "Chance:",
-  "tooltip.chronicler_lh.recorder.info": "§8With the item in the off hand, holding Shift and right click to record the information §e§l(WARN: The item will be destroyed)",
+  "tooltip.chronicler_lh.recorder.info": "§7With the item in the off hand, holding Shift and right click to record the information §e§l(WARN: The item will be destroyed)",
 
   "tooltip.chronicler_lh.inscription": "Load:",
   "tooltip.chronicler_lh.inscription.dyson_sphere":"§b§lDyson Sphere",

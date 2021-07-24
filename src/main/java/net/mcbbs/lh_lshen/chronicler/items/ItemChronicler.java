@@ -139,8 +139,8 @@ public class ItemChronicler extends Item {
             ItemStack storeItem = ((ItemRecordPage) off.getItem()).getStoreItem(off);
             if (!storeItem.isEmpty()){
                 if (!StoreHelper.hasItemStack(cap_list,storeItem)) {
+                    StoreHelper.addItemStack(cap_list,storeItem);
                     if (!world.isClientSide) {
-                        StoreHelper.addItemStack(cap_list,storeItem);
                         off.shrink(1);
                     }
                     if (world.isClientSide ) {
