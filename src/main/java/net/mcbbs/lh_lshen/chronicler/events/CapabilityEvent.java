@@ -4,9 +4,6 @@ import net.mcbbs.lh_lshen.chronicler.Utils;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.EffectPlayerProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.InscriptionProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.StellarisEnergyProvider;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
@@ -25,16 +22,22 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber()
 public final class CapabilityEvent {
+//    private static final ResourceLocation ITEM_LIST = new ResourceLocation(Utils.MOD_ID, "item_list");
+//    private static final ResourceLocation ENERGY = new ResourceLocation(Utils.MOD_ID, "stellaris_energy");
+//    private static final ResourceLocation INSCRIPTION = new ResourceLocation(Utils.MOD_ID, "inscription");
 
-    @SubscribeEvent
-    public static void onAttachItemStackCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {
-        ItemStack itemStack = event.getObject();
-        if (itemStack.getItem() instanceof ItemChronicler) {
-            event.addCapability(new ResourceLocation(Utils.MOD_ID, "item_list"), new ItemListProvider());
-            event.addCapability(new ResourceLocation(Utils.MOD_ID, "stellaris_energy"), new StellarisEnergyProvider());
-            event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription"), new InscriptionProvider());
-        }
-    }
+//    @SubscribeEvent
+//    public static void onAttachItemStackCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {
+//        ItemStack itemStack = event.getObject();
+//        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemChronicler) {
+//            if (!itemStack.getOrCreateTag().getBoolean("hasCap")) {
+//                event.addCapability(ITEM_LIST, new ItemListProvider());
+//                event.addCapability(ENERGY, new StellarisEnergyProvider());
+//                event.addCapability(INSCRIPTION, new InscriptionProvider());
+//                itemStack.getOrCreateTag().putBoolean("hasCap",true);
+//            }
+//        }
+//    }
 
     @SubscribeEvent
     public static void onAttachEntityCapabilityEvent(AttachCapabilitiesEvent<Entity> event) {
@@ -44,6 +47,20 @@ public final class CapabilityEvent {
         }
     }
 //
+    @SubscribeEvent
+    public static void onItemUptateEvent(TickEvent.PlayerTickEvent event) {
+//        PlayerEntity player = event.player;
+//        if (!player.level.isClientSide()) {
+//            for (int i=0;i<player.inventory.getContainerSize();i++) {
+//                ItemStack stack = player.inventory.getItem(i);
+//                if (stack.getItem() instanceof ItemChronicler && ItemChronicler.isOpen(stack,player)){
+//                    DataHelper.synChroniclerCaps(stack, player);
+//                }
+//            }
+//        }
+    }
+
+
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if (!event.isWasDeath()) {
@@ -59,6 +76,7 @@ public final class CapabilityEvent {
         }
     }
 
+    @SubscribeEvent
     public static void synCapEvent(TickEvent.PlayerTickEvent event){
         PlayerEntity player = event.player;
         ICapabilityEffectPlayer effectInscription = DataHelper.getEffectPlayerCapability(player);

@@ -3,6 +3,7 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.provider;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -48,7 +49,7 @@ public class EffectPlayerProvider implements ICapabilityProvider, INBTSerializab
 
         @Override
         public void readNBT(Capability<ICapabilityEffectPlayer> capability, ICapabilityEffectPlayer instance, Direction side, INBT nbt) {
-            if(instance instanceof CapabilityInscription && nbt instanceof CompoundNBT){
+            if(instance instanceof CapabilityEffectPlayer && nbt instanceof CompoundNBT){
                 instance.deserializeNBT((CompoundNBT) nbt);
             }
         }

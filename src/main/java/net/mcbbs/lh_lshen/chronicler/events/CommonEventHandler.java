@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.events;
 
+import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
@@ -8,10 +9,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.EffectPlayerProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.InscriptionProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemListProvider;
-import net.mcbbs.lh_lshen.chronicler.capabilities.provider.StellarisEnergyProvider;
+import net.mcbbs.lh_lshen.chronicler.capabilities.provider.*;
 import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.loot.LootTableLoader;
@@ -23,6 +21,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonEventHandler {
@@ -32,32 +31,14 @@ public class CommonEventHandler {
     public static void onCommonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(ChroniclerNetwork::registerMessage);
         event.enqueueWork(()->{
-                new InscriptionRegister();
-                new LootTableLoader();
+            new InscriptionRegister();
+            new LootTableLoader();
         });
-    }
-
-    @SubscribeEvent
-    public static void onCapabilitySetupEvent(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            CapabilityManager.INSTANCE.register(ICapabilityItemList.class, new ItemListProvider.Storage(),CapabilityItemList::new);
-            CapabilityManager.INSTANCE.register(ICapabilityStellarisEnergy.class, new StellarisEnergyProvider.Storage(), CapabilityStellarisEnergy::new);
-            CapabilityManager.INSTANCE.register(ICapabilityInscription.class, new InscriptionProvider.Storage(), CapabilityInscription::new);
+            CapabilityManager.INSTANCE.register(ICapabilityItemList.class, new ItemChroniclerProvider.ItemListStorage(), CapabilityItemList::new);
+            CapabilityManager.INSTANCE.register(ICapabilityStellarisEnergy.class, new ItemChroniclerProvider.EnergyStorage(), CapabilityStellarisEnergy::new);
+            CapabilityManager.INSTANCE.register(ICapabilityInscription.class, new ItemChroniclerProvider.InscriptionStorage(), CapabilityInscription::new);
             CapabilityManager.INSTANCE.register(ICapabilityEffectPlayer.class, new EffectPlayerProvider.Storage(), CapabilityEffectPlayer::new);
-//                    new Capability.IStorage<ICapabilityItemList>() {
-//                        @Nullable
-//                        @Override
-//                        public INBT writeNBT(Capability<ICapabilityItemList> capability, ICapabilityItemList instance, Direction side) {
-//                            return instance.serializeNBT();
-//                        }
-//
-//                        @Override
-//                        public void readNBT(Capability<ICapabilityItemList> capability, ICapabilityItemList instance, Direction side, INBT nbt) {
-//                            if(instance instanceof CapabilityItemList && nbt instanceof ListNBT){
-//                                instance.deserializeNBT((ListNBT) nbt);
-//                            }
-//                        }
-//                    }
         });
     }
 
@@ -68,22 +49,6 @@ public class CommonEventHandler {
         containerTypeChronicler.setRegistryName("container_chronicler");
         event.getRegistry().register(containerTypeChronicler);
     }
-
-
-
-//    @SubscribeEvent
-//    public static void onAttachCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {
-//        PlayerEntity playerEntity = event.getObject();
-//        ItemStack itemStack = event.getObject();
-//        if (itemStack.getItem() instanceof ItemChronicler) {
-//            event.addCapability(new ResourceLocation(Utils.MOD_ID, "stellaris_energy"), new StellarisEnergyProvider());
-//        }
-//    }
-
-//    @SubscribeEvent
-//    public static void synEnergyEvent(TickEvent.PlayerTickEvent event) {
-//
-//    }
 
 
 }

@@ -14,6 +14,14 @@
   "message.chronicler.gui.produce": "创生",
   "message.chronicler_lh.inscription.hope_flower.damage": "伤害附加:10+%s",
 
+  "tooltip.chronicler_lh.chronicler.energy": "星能:%s",
+  "tooltip.chronicler_lh.chronicler.energy.max": "能量上限:%s",
+  "tooltip.chronicler_lh.chronicler.inscription": "刻印:",
+  "tooltip.chronicler_lh.chronicler.inscription.level": "刻印等级:",
+  "tooltip.chronicler_lh.chronicler.info": "§7按住Shift键以查看详情",
+  "tooltip.chronicler_lh.chronicler.list.type": "类型:%s",
+  "tooltip.chronicler_lh.chronicler.list.size": "储存:%s",
+
   "tooltip.chronicler_lh.record_page.condition": "状态:",
   "tooltip.chronicler_lh.record_page.condition.stored": "已储存",
   "tooltip.chronicler_lh.record_page.condition.empty": "空",

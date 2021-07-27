@@ -1,6 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities.api;
 
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 

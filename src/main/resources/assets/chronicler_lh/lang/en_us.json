@@ -14,6 +14,14 @@
   "message.chronicler.gui.produce": "Create",
   "message.chronicler_lh.inscription.hope_flower.damage": "Extra Damage Stored:10+%s",
 
+  "tooltip.chronicler_lh.chronicler.energy": "Energy:%s",
+  "tooltip.chronicler_lh.chronicler.energy.max": "Energy Capacity:%s",
+  "tooltip.chronicler_lh.chronicler.inscription": "Inscription:",
+  "tooltip.chronicler_lh.chronicler.inscription.level": "Inscription Level:",
+  "tooltip.chronicler_lh.chronicler.info": "§7Press Shift to get more Information",
+  "tooltip.chronicler_lh.chronicler.list.type": "Types:%s",
+  "tooltip.chronicler_lh.chronicler.list.size": "Size:%s",
+
   "tooltip.chronicler_lh.record_page.condition": "Condition:",
   "tooltip.chronicler_lh.record_page.condition.stored": "Stored",
   "tooltip.chronicler_lh.record_page.condition.empty": "Empty",

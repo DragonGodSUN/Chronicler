@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 
 public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     private int energy;
@@ -20,11 +21,13 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     @Override
     public void setEnergyPoint(int point) {
         this.energy = point;
+        setDirty(true);
     }
 
     @Override
     public void setEnergyMax(int point) {
         this.maxEnergy = point;
+        setDirty(true);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
             }else {
                 this.energy = maxEnergy;
             }
-            this.setDirty(true);
+        this.setDirty(true);
         }
     }
 
@@ -89,7 +92,9 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        this.energy = nbt.getInt("energy");
-        this.maxEnergy = nbt.getInt("max");
+        if (nbt != null) {
+            this.energy = nbt.getInt("energy");
+            this.maxEnergy = nbt.getInt("max");
+        }
     }
 }

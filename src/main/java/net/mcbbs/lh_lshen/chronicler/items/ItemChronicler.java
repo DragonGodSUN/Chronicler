@@ -4,14 +4,22 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemChroniclerProvider;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inscription.IInscription;
 import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
+import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynItemNBTInHandMessage;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -26,38 +34,50 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
+import org.lwjgl.glfw.GLFW;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class ItemChronicler extends Item {
+
     public ItemChronicler() {
         super(new Properties().tab(ModGroup.GROUP_CHRONICLER).fireResistant().stacksTo(1));
     }
 
-//  使用能力系统进行充能，不选择shareNbt，一个原因是该NBT改变时，持有的ItemStack会不断重载
     @Override
     public void inventoryTick(ItemStack itemStack, World world, Entity entity, int tick, boolean flag) {
-        if (!entity.level.isClientSide) {
-            if (entity instanceof PlayerEntity) {
-                ICapabilityItemList cap_list = DataHelper.getItemListCapability(itemStack);
+        if (entity instanceof PlayerEntity) {
+            if (!world.isClientSide()) {
                 ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(itemStack);
+                energy.charge(1);
                 ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
-                if (cap_list!=null && energy!=null && inscription!=null){
-                    IInscription iInscription = InscriptionRegister.getInscription(inscription.getInscription());
-                    if (iInscription!=null){
-                        iInscription.tickEffect(entity,itemStack);
-                    }
-                    energy.charge(1);
-
+                IInscription iInscription = InscriptionRegister.getInscription(inscription.getInscription());
+                if (iInscription!=null){
+                    iInscription.tickEffect(entity,itemStack);
                 }
-                DataHelper.synEnergyCap(itemStack, (PlayerEntity) entity);
+                DataHelper.synChroniclerCaps(itemStack, (PlayerEntity) entity);
             }
         }
         super.inventoryTick(itemStack, world, entity, tick, flag);
+
+    }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        if (getId(oldStack).equals(getId(newStack))){
+            return false;
+        }
+        return super.shouldCauseReequipAnimation(oldStack,newStack,slotChanged);
     }
 
     @Override
@@ -71,26 +91,69 @@ public class ItemChronicler extends Item {
                 loadPage(itemStack_l, world, playerEntity,cap_list);
                 loadInscription(itemStack_l,itemStack,world,playerEntity);
             }else {
-                if (!world.isClientSide ) {
+                if (!world.isClientSide ()) {
+                    if (!isOpen(itemStack,playerEntity)){
+                        String id = UUID.randomUUID().toString();
+                        setId(itemStack,id);
+                    }
+                    ChroniclerNetwork.sendToClientPlayer(new SynItemNBTInHandMessage(itemStack),playerEntity);
                     openGUI(itemStack, (ServerPlayerEntity) playerEntity);
                 }
+
             playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
             }
         });
-        return ActionResult.success(itemStack);
+            return ActionResult.success(itemStack);
         }
-        return  super.use(world,playerEntity,hand);
+        return super.use(world,playerEntity,hand);
     }
-    
+
+    @Override
+    public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> tooltips, ITooltipFlag flag) {
+        super.appendHoverText(itemStack, world, tooltips, flag);
+        boolean isKeyDown = InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
+        int type = 0;
+        int size = 0;
+        ICapabilityItemList list = DataHelper.getItemListCapability(itemStack);
+        ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(itemStack);
+        ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
+        for (Map.Entry<String,List<ItemStack>> stacks:list.getAllMap().entrySet()){
+            type++;
+            for (ItemStack stack : stacks.getValue()){
+                size++;
+            }
+        }
+        tooltips.add(new StringTextComponent(getId(itemStack)));
+        tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy",""+TextFormatting.AQUA+energy.getEnergyPoint()));
+        if (isKeyDown){
+            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy.max",""+TextFormatting.AQUA+energy.getEnergyMax()));
+        }
+        if (!inscription.getInscription().isEmpty()) {
+            tooltips.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.chronicler.inscription")
+                    + I18n.get(ItemInscription.getKey(inscription.getInscription()))));
+            if (isKeyDown){
+                tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.inscription.level",inscription.getLevel()));
+            }
+        }
+        if (!isKeyDown){
+            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.info"));
+        }
+        if (isKeyDown) {
+            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.list.type", type));
+            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.list.size", size));
+        }
+    }
+
     private void openGUI(ItemStack chronicler, ServerPlayerEntity serverPlayerEntity){
-        INamedContainerProvider containerProvider = new ContainerProviderChronicler(this, chronicler);
+        INamedContainerProvider containerProvider = new ContainerProviderChronicler(chronicler);
         NetworkHooks.openGui(serverPlayerEntity,
                 containerProvider,
 //               发送物品列表信息到容器中
                 (packetBuffer)->{
-                    setRandomId(chronicler);
-                    ListNBT listNBT = getListNBT(chronicler);
+                    packetBuffer.writeUtf(getId(chronicler));
                     packetBuffer.writeItemStack(chronicler,false);
+
+                    ListNBT listNBT = getListNBT(chronicler);
                     packetBuffer.writeInt(listNBT.size());
                     for (int i=0;i<listNBT.size();i++){
                         CompoundNBT nbt = listNBT.getCompound(i);
@@ -98,36 +161,38 @@ public class ItemChronicler extends Item {
                             packetBuffer.writeNbt(nbt);
                         }
                     }
+
                     packetBuffer.writeNbt(DataHelper.getStellarisEnergyCapability(chronicler).serializeNBT());
                     packetBuffer.writeNbt(DataHelper.getInscriptionCapability(chronicler).serializeNBT());
                 });
     }
-        private void loadInscription(ItemStack off, ItemStack chronicler, World world, PlayerEntity playerEntity){
-            if (off.getItem() instanceof ItemInscription){
-                ICapabilityInscription inscription = DataHelper.getInscriptionCapability(chronicler);
-                ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(chronicler);
-                String id = ItemInscription.getInscription(off);
-                int level = ItemInscription.getLevel(off);
-                if (!id.isEmpty()){
-                    if (!inscription.getInscription().isEmpty() && !playerEntity.level.isClientSide()){
-                        ItemStack stack_new = ItemInscription.getSubStack(inscription.getInscription());
-                        if (playerEntity.inventory.getFreeSlot()!=-1) {
-                            playerEntity.inventory.add(stack_new.copy());
-                        }else {
-                            playerEntity.drop(stack_new.copy(),true);
-                        }
+
+    private void loadInscription(ItemStack off, ItemStack chronicler, World world, PlayerEntity playerEntity){
+        if (off.getItem() instanceof ItemInscription){
+            ICapabilityInscription inscription = DataHelper.getInscriptionCapability(chronicler);
+            ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(chronicler);
+            String id = ItemInscription.getInscription(off);
+            int level = ItemInscription.getLevel(off);
+            if (!id.isEmpty()){
+                if (!inscription.getInscription().isEmpty() && !playerEntity.level.isClientSide()){
+                    ItemStack stack_new = ItemInscription.getSubStack(inscription.getInscription());
+                    if (playerEntity.inventory.getFreeSlot()!=-1) {
+                        playerEntity.inventory.add(stack_new.copy());
+                    }else {
+                        playerEntity.drop(stack_new.copy(),true);
                     }
-                    energy.resetMax();
-                    inscription.setInscription(id);
-                    inscription.setLevel(level);
-                    off.shrink(1);
-                    if (world.isClientSide ) {
-                        playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.inscription.load", I18n.get(ItemInscription.getKey(id))), UUID.randomUUID());
-                        playerEntity.playSound(SoundEvents.GRINDSTONE_USE,1f,1f);
-                    }
+                }
+                energy.resetMax();
+                inscription.setInscription(id);
+                inscription.setLevel(level);
+                off.shrink(1);
+                if (world.isClientSide ) {
+                    playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.inscription.load", I18n.get(ItemInscription.getKey(id))), UUID.randomUUID());
+                    playerEntity.playSound(SoundEvents.GRINDSTONE_USE,1f,1f);
                 }
             }
         }
+    }
 
     private void loadPage(ItemStack off, World world, PlayerEntity playerEntity, ICapabilityItemList cap_list){
         if (off.getItem() instanceof ItemRecordPage){
@@ -152,112 +217,114 @@ public class ItemChronicler extends Item {
         return itemListCapability.serializeNBT();
     }
 
-
-    public static void setRandomId(ItemStack stack){
-        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-        if (!stack.isEmpty()){
-            cap_list.setUuid(UUID.randomUUID().toString());
+    public static boolean isOpen(ItemStack itemStack, PlayerEntity player){
+        if (player!=null&&itemStack!=null) {
+            return !getId(itemStack).isEmpty() && isUnique(itemStack, player);
         }
+        return false;
     }
 
     public static void setId(ItemStack stack, String id){
-        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-        if (!stack.isEmpty()){
-            cap_list.setUuid(id);
-        }
+        CompoundNBT compoundNBT = stack.getOrCreateTag();
+        compoundNBT.putString("ID",id);
     }
 
     public static String getId(ItemStack stack){
-        ICapabilityItemList cap_list = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-        if (!stack.isEmpty()){
-            return  cap_list.getUuid();
-        }
-        return "";
+        CompoundNBT compoundNBT = stack.getOrCreateTag();
+        return compoundNBT.getString("ID");
     }
 
-//    public SelectCompnent getSelectCompnent(ContainerChronicler container, ItemStack stack) {
-//        CompoundNBT nbt = stack.getShareTag();
-//        SelectCompnent selectCompnent = new SelectCompnent();
-//        if (nbt != null) {
-//            int page = nbt.getInt("page");
-//            int slot = nbt.getInt("slot_select");
-//            int slot_size = nbt.getInt("slot_size");
-//            List<Integer> stack_list = Lists.newArrayList();
-//            for (int i=0;i<slot_size;i++) {
-//                int stack_unit = nbt.getInt("stack_list:"+i);
-//                stack_list.add(stack_unit);
-//            }
-//        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-//            if (capabilityItemList!=null){
-//                selectCompnent = new SelectCompnent(container,page,stack_list,capabilityItemList);
-//                selectCompnent.selectSlot(slot);
-//            }
-//        }
-//        return selectCompnent;
-//    }
-//
-//    public void setSelectCompnent(ItemStack stack, SelectCompnent selectCompnent) {
-//        CompoundNBT nbt = stack.getShareTag();
-//        if (nbt !=null && selectCompnent != null) {
-//            nbt.putInt("page",selectCompnent.page);
-//            nbt.putInt("slot_select",selectCompnent.selectSlot);
-//            nbt.putInt("stack_size",selectCompnent.stackList.size());
-//            for (int i = 0; i<selectCompnent.stackList.size(); i++) {
-//                nbt.putInt("stack_list:"+i,selectCompnent.stackList.get(i));
-//            }
-//        }
-//
-//    }
+    private static boolean isUnique(ItemStack stack, PlayerEntity playerEntity){
+        for (int i=0;i<playerEntity.inventory.getContainerSize();i++){
+            ItemStack inv_stack = playerEntity.inventory.getItem(i);
+            if (inv_stack.getItem() instanceof ItemChronicler){
+                if (!inv_stack.equals(stack)
+                    &&getId(inv_stack).equals(getId(stack))){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void putCapsTag(ItemStack stack) {
+        CompoundNBT baseTag = stack.getOrCreateTag();
+
+        CapabilityItemList cap_list = DataHelper.getItemListCapability(stack);
+        CapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
+        CapabilityInscription inscription = DataHelper.getInscriptionCapability(stack);
+
+        ListNBT nbt_list = cap_list.serializeNBT();
+        CompoundNBT nbt_energy = energy.serializeNBT();
+        CompoundNBT nbt_inscription = inscription.serializeNBT();
+
+        int size = nbt_list.size();
+        baseTag.putInt("cap_list:size",size);
+        for (int i=0;i<size;i++){
+            CompoundNBT e = nbt_list.getCompound(i);
+            baseTag.put("cap_list:"+i,e);
+        }
+        baseTag.put("energy",nbt_energy);
+        baseTag.put("inscription",nbt_inscription);
+
+        stack.setTag(baseTag);
+    }
+
+    public static void readCapsTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+        stack.setTag(nbt);
+        CapabilityItemList cap_list = DataHelper.getItemListCapability(stack);
+        CapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
+        CapabilityInscription inscription = DataHelper.getInscriptionCapability(stack);
+
+        ListNBT nbt_list = new ListNBT();
+        int size = nbt.getInt("cap_list:size");
+        for (int i = 0;i<size;i++){
+            CompoundNBT eNBT = nbt.getCompound("cap_list:"+i);
+            nbt_list.add(eNBT);
+        }
+        cap_list.deserializeNBT(nbt_list);
+
+        CompoundNBT nbt_energy = nbt.getCompound("energy");
+        energy.deserializeNBT(nbt_energy);
+
+        CompoundNBT nbt_inscription = nbt.getCompound("inscription");
+        inscription.deserializeNBT(nbt_inscription);
+    }
+
 
 //    @Nullable
 //    @Override
 //    public CompoundNBT getShareTag(ItemStack stack) {
-//        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
-//        if (energy == null) {
-//            return new CompoundNBT();
+//        CompoundNBT nbt = new CompoundNBT();
+//        putCapsTag(stack);
+//        if (stack.getTag()!=null) {
+//            nbt.put("nbtTags",stack.getTag());
 //        }
-//        CompoundNBT nbt = energy.serializeNBT();
 //        return nbt;
 //    }
 //
-//    @Override
-//    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-//        ICapabilityStellarisEnergy energy = stack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
-//        energy.deserializeNBT(nbt);
-//    }
+    @Override
+    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
+        if (nbt == null) {
+            stack.setTag(null);
+            return;
+        }
+        readCapsTag(stack,nbt);
+    }
 
-    //    @Override
-//    public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-//        SelectCompnent selectCompnent = new SelectCompnent();
-//        if (nbt != null) {
-//            int page = nbt.getInt("page");
-//            int slot = nbt.getInt("slot_select");
-//            int slot_size = nbt.getInt("slot_size");
-//            List<Integer> stack_list = Lists.newArrayList();
-//            for (int i=0;i<slot_size;i++) {
-//                int stack_unit = nbt.getInt("stack_list:"+i);
-//                stack_list.add(stack_unit);
-//            }
-//        ICapabilityItemList capabilityItemList = stack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);
-//        if (capabilityItemList!=null){
-//            selectCompnent = new SelectCompnent(page,stack_list,capabilityItemList);
-//            selectCompnent.selectSlot(slot);
-//            }
+    @Nullable
+    @Override
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+        ItemChroniclerProvider provider = new ItemChroniclerProvider();
+//        if (nbt!=null) {
+//            provider.deserializeNBT(nbt);
 //        }
-//        super.readShareTag(stack, nbt);
-//    }
-
-//    @Nullable
-//    @Override
-//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-//        return new ItemListProvider();
-//    }
+            return provider;
+    }
 
     private static class ContainerProviderChronicler implements INamedContainerProvider {
-        public ContainerProviderChronicler(ItemChronicler itemChronicler, ItemStack itemStackChronicler) {
-            this.itemChronicler = itemChronicler;
+        public ContainerProviderChronicler(ItemStack itemStackChronicler) {
             this.itemStackChronicler = itemStackChronicler;
-
         }
 
         @Override
@@ -268,7 +335,9 @@ public class ItemChronicler extends Item {
         @Override
         public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
             ContainerChronicler newContainerServerSide =
-                    ContainerChronicler.createContainerServerSide(windowID, playerInventory,
+                    ContainerChronicler.createContainerServerSide(windowID,
+                            ItemChronicler.getId(itemStackChronicler),
+                            playerInventory,
                             DataHelper.getItemListCapability(itemStackChronicler),
                             DataHelper.getStellarisEnergyCapability(itemStackChronicler),
                             DataHelper.getInscriptionCapability(itemStackChronicler),
@@ -276,8 +345,6 @@ public class ItemChronicler extends Item {
             return newContainerServerSide;
         }
 
-
-        private ItemChronicler itemChronicler;
         private ItemStack itemStackChronicler;
     }
 

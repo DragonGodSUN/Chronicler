@@ -6,9 +6,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageEnergyCapMessage;
-import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageInscriptionCapMessage;
-import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.ManageItemListCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.*;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 

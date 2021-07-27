@@ -9,14 +9,14 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 
 public class ModCapability {
     @CapabilityInject(ICapabilityItemList.class)
-    public static Capability<ICapabilityItemList> ITEMLIST_CAPABILITY;
+    public static Capability<ICapabilityItemList> ITEMLIST_CAPABILITY = null;
 
     @CapabilityInject(ICapabilityStellarisEnergy.class)
-    public static Capability<ICapabilityStellarisEnergy> ENERGY_CAPABILITY;
+    public static Capability<ICapabilityStellarisEnergy> ENERGY_CAPABILITY = null;
 
     @CapabilityInject(ICapabilityInscription.class)
-    public static Capability<ICapabilityInscription> INSCRIPTION_CAPABILITY;
+    public static Capability<ICapabilityInscription> INSCRIPTION_CAPABILITY = null;
 
     @CapabilityInject(ICapabilityEffectPlayer.class)
-    public static Capability<ICapabilityEffectPlayer> EFFECT_PLAYER;
+    public static Capability<ICapabilityEffectPlayer> EFFECT_PLAYER = null;
 }

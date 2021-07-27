@@ -41,7 +41,9 @@ public class ContainerChronicler extends Container {
     public final int STAR_SIZE = 40;
     public boolean starTriggered;
 
-    protected ContainerChronicler(int windowId, PlayerInventory playerInv,
+    protected ContainerChronicler(int windowId,
+                                  String id,
+                                  PlayerInventory playerInv,
                                   CapabilityItemList cap_list,
                                   CapabilityStellarisEnergy energy,
                                   CapabilityInscription inscription,
@@ -52,7 +54,7 @@ public class ContainerChronicler extends Container {
         this.inscription = inscription;
         this.itemStack = itemStack;
         this.inventory_player = playerInv;
-        this.id = cap_list.getUuid();
+        this.id = id;
         initSelectCompnent();
         loadSlots();
     }
@@ -170,12 +172,13 @@ public class ContainerChronicler extends Container {
         return false;
     }
 
-    public static ContainerChronicler createContainerServerSide(int windowID, PlayerInventory playerInventory, CapabilityItemList cap_list, CapabilityStellarisEnergy energy,
+    public static ContainerChronicler createContainerServerSide(int windowID,String id, PlayerInventory playerInventory, CapabilityItemList cap_list, CapabilityStellarisEnergy energy,
                                                                 CapabilityInscription inscription, ItemStack itemStack) {
-        return new ContainerChronicler(windowID, playerInventory, cap_list, energy,inscription, itemStack);
+        return new ContainerChronicler(windowID, id, playerInventory, cap_list, energy,inscription, itemStack);
     }
 
     public static ContainerChronicler createContainerClientSide(int windowID, PlayerInventory playerInventory, net.minecraft.network.PacketBuffer extraData) {
+        String id = extraData.readUtf();
         ItemStack stack = extraData.readItem();
         int size = extraData.readInt();
         ListNBT listNBT = new ListNBT();
@@ -196,13 +199,13 @@ public class ContainerChronicler extends Container {
             capabilityInscription.deserializeNBT(inscriptionNBT);
         try {
             if (capabilityItemList!=null) {
-                ContainerChronicler container = new ContainerChronicler(windowID, playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, stack);
+                ContainerChronicler container = new ContainerChronicler(windowID, id, playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, stack);
                 return container;
             }
             } catch (IllegalArgumentException iae) {
                 Logger.getGlobal().info(iae.toString());
             }
-            return new ContainerChronicler(windowID, playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, ItemStack.EMPTY);
+            return new ContainerChronicler(windowID, id , playerInventory, capabilityItemList, capabilityEnergy, capabilityInscription, ItemStack.EMPTY);
         }
         return null;
     }
@@ -210,7 +213,7 @@ public class ContainerChronicler extends Container {
     @Override
     public boolean stillValid(PlayerEntity player) {
         ItemStack main = player.getMainHandItem();
-        return (!main.isEmpty() && main == itemStack);
+        return (!main.isEmpty() && main.getItem() instanceof ItemChronicler);
     }
 
     @Override
@@ -270,7 +273,7 @@ public class ContainerChronicler extends Container {
     public void broadcastChanges() {
         if (cap_list.isDirty()) {
             loadSlots();
-            StoreHelper.synItemListCapabilityToSever(this.itemStack,this.cap_list);
+//            StoreHelper.synItemListCapabilityToSever(this.itemStack,this.cap_list);
             cap_list.setDirty(false);
         }
         super.broadcastChanges();

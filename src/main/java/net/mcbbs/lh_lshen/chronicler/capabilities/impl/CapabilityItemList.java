@@ -42,6 +42,7 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public void setAllMap(Map<String, List<ItemStack>> map) {
         this.itemAllMap = map;
+        markDirty();
     }
 
     @Override
@@ -57,10 +58,12 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public void setUuid(String uuid) {
         this.uuid = uuid;
+        markDirty();
     }
 
     public void setKeyList(List<String> keyList) {
         this.keyList = keyList;
+        markDirty();
     }
 
     @Override
@@ -68,6 +71,7 @@ public class CapabilityItemList implements ICapabilityItemList {
         if (index < keyList.size()) {
             keyList.set(index,id);
         }
+        markDirty();
     }
 
 
@@ -106,6 +110,7 @@ public class CapabilityItemList implements ICapabilityItemList {
             keyList.add(itemStack1.getItem().getRegistryName().toString());
             itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
         }
+        markDirty();
     }
 
     @Override
@@ -122,6 +127,7 @@ public class CapabilityItemList implements ICapabilityItemList {
                 itemAllMap.put(itemStack1.getItem().getRegistryName().toString(),itemList_new);
             }
         }
+        markDirty();
     }
 
 
@@ -136,6 +142,7 @@ public class CapabilityItemList implements ICapabilityItemList {
             itemAllMap.remove(item_id);
             keyList.remove(item_id);
         }
+        markDirty();
     }
 
     @Override
@@ -145,6 +152,7 @@ public class CapabilityItemList implements ICapabilityItemList {
 
     public void setInventoryStar(Inventory inventoryStar) {
         this.inventoryStar = inventoryStar;
+        markDirty();
     }
 
     @Override
@@ -160,6 +168,7 @@ public class CapabilityItemList implements ICapabilityItemList {
         if (!flag&&this.inventoryStar.canAddItem(itemStack)){
             this.inventoryStar.addItem(itemStack);
         }
+        markDirty();
 
     }
 
@@ -172,6 +181,7 @@ public class CapabilityItemList implements ICapabilityItemList {
                 break;
             }
         }
+        markDirty();
 
     }
 
@@ -229,32 +239,34 @@ public class CapabilityItemList implements ICapabilityItemList {
         List<String> id_list = Lists.newArrayList();
         Inventory inventory_nbt = new Inventory(8);
 
-        for (INBT tag:nbtList){
-            if (tag instanceof CompoundNBT){
-                CompoundNBT itemNbt = (CompoundNBT) tag;
-                String type = itemNbt.getString("type");
-                if (type.equals("lib")) {
-                    String id = itemNbt.getString("item_id");
-                    ItemStack stack = ItemStack.of(itemNbt);
-                    if (!stack.isEmpty()) {
-                        id_list.add(id);
-                        if (!itemStackList.contains(stack)) {
-                            itemStackList.add(stack);
+        if (nbtList != null) {
+            for (INBT tag: nbtList){
+                if (tag instanceof CompoundNBT){
+                    CompoundNBT itemNbt = (CompoundNBT) tag;
+                    String type = itemNbt.getString("type");
+                    if (type.equals("lib")) {
+                        String id = itemNbt.getString("item_id");
+                        ItemStack stack = ItemStack.of(itemNbt);
+                        if (!stack.isEmpty()) {
+                            id_list.add(id);
+                            if (!itemStackList.contains(stack)) {
+                                itemStackList.add(stack);
+                            }
                         }
                     }
-                }
-                if (type.equals("star")) {
-                    ItemStack stack = ItemStack.of(itemNbt);
-                    inventory_nbt.addItem(stack);
-                }
-                if (type.equals("key")) {
-                String id_config = itemNbt.getString("id_config");
-                if (id_list.contains(id_config)) {
-                    itemStackConfigList.add(id_config);
+                    if (type.equals("star")) {
+                        ItemStack stack = ItemStack.of(itemNbt);
+                        inventory_nbt.addItem(stack);
                     }
-                }
-                if (type.equals("uuid")) {
-                    this.uuid = itemNbt.getString("uuid");
+                    if (type.equals("key")) {
+                    String id_config = itemNbt.getString("id_config");
+                    if (id_list.contains(id_config)) {
+                        itemStackConfigList.add(id_config);
+                        }
+                    }
+                    if (type.equals("uuid")) {
+                        this.uuid = itemNbt.getString("uuid");
+                    }
                 }
             }
         }

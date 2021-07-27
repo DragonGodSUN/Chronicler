@@ -52,19 +52,20 @@ public class SynEffectPlayerMessage {
             ctx.get().enqueueWork(() -> {
                 setCapability(message);
             });
-            ctx.get().setPacketHandled(true);
         }
+        ctx.get().setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)
     private static void setCapability(SynEffectPlayerMessage message){
         CapabilityEffectPlayer cap = (CapabilityEffectPlayer) message.effectInscription;
         UUID uuid = UUID.fromString(message.id);
-        PlayerEntity player = Minecraft.getInstance().player.level.getPlayerByUUID(uuid);
-        if (cap!=null && player!=null) {
-            ICapabilityEffectPlayer cap_clent = DataHelper.getEffectPlayerCapability(player);
-            cap_clent.deserializeNBT(cap.serializeNBT());
+        if (Minecraft.getInstance().player!=null) {
+            PlayerEntity player = Minecraft.getInstance().player.level.getPlayerByUUID(uuid);
+            if (cap != null && player != null) {
+                ICapabilityEffectPlayer cap_clent = DataHelper.getEffectPlayerCapability(player);
+                cap_clent.deserializeNBT(cap.serializeNBT());
+            }
         }
-
     }
 }

@@ -25,7 +25,7 @@ public class SynContainerEnergyCapMessage {
 
     public static void encode(SynContainerEnergyCapMessage message, PacketBuffer buf) {
         if (message.energy!=null) {
-            CompoundNBT compoundNBT = message.energy.serializeNBT();
+            CompoundNBT compoundNBT =  message.energy.serializeNBT();
             buf.writeUtf(message.id);
             buf.writeNbt(compoundNBT);
         }
@@ -47,8 +47,8 @@ public class SynContainerEnergyCapMessage {
             ctx.get().enqueueWork(() -> {
                 setCapability(message);
             });
-            ctx.get().setPacketHandled(true);
         }
+        ctx.get().setPacketHandled(true);
     }
 
     @OnlyIn(Dist.CLIENT)

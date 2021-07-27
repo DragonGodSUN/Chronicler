@@ -10,26 +10,86 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
+import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynContainerEnergyCapMessage;
+import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
+
+import java.util.UUID;
 
 public class DataHelper {
 //  将服务端的数据发送给客户端的容器
-    public static void synEnergyCap(ItemStack itemStack, PlayerEntity player){
-        LazyOptional<ICapabilityStellarisEnergy> energyLazyOptional = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null);
-        energyLazyOptional.ifPresent((energy)->{
-            if (energy.isDirty() && player !=null){
-                if (player.containerMenu instanceof ContainerChronicler){
-                    ICapabilityItemList cap_list = DataHelper.getItemListCapability(itemStack);
-                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(cap_list.getUuid(),energy), player);
-                }
-                energy.setDirty(false);
+public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity player){
+    LazyOptional<ICapabilityStellarisEnergy> energyLazyOptional = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null);
+    energyLazyOptional.ifPresent((energy)->{
+        if (energy.isDirty() && player !=null){
+            if (player.containerMenu instanceof ContainerChronicler){
+                ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
             }
-        });
+            energy.setDirty(false);
+        }
+    });
+}
+
+//    public static void synItemListCap(ItemStack itemStack, PlayerEntity player){
+//        LazyOptional<ICapabilityItemList> listLazyOptional = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY,null);
+//        listLazyOptional.ifPresent((itemList)->{
+//            if (itemList.isDirty() && player !=null){
+//                ChroniclerNetwork.sendToClientPlayer(new SynItemListCapMessage(itemStack,itemList), player);
+//                itemList.setDirty(false);
+//            }
+//        });
+//    }
+//
+//    public static void synEnergyCap(ItemStack itemStack, PlayerEntity player){
+//        LazyOptional<ICapabilityStellarisEnergy> energyLazyOptional = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY,null);
+//        energyLazyOptional.ifPresent((energy)->{
+//            if (energy.isDirty() && player !=null){
+//                ChroniclerNetwork.sendToClientPlayer(new SynEnergyCapMessage(itemStack,energy), player);
+//                if (player.containerMenu instanceof ContainerChronicler){
+//                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
+//                }
+//                energy.setDirty(false);
+//            }
+//        });
+//    }
+//
+//    public static void synInscriptionCap(ItemStack itemStack, PlayerEntity player){
+//        LazyOptional<ICapabilityInscription> listLazyOptional = itemStack.getCapability(ModCapability.INSCRIPTION_CAPABILITY,null);
+//        listLazyOptional.ifPresent((inscription)->{
+//            if (inscription.isDirty() && player !=null){
+//                ChroniclerNetwork.sendToClientPlayer(new SynInscriptionCapMessage(itemStack,inscription), player);
+//                inscription.setDirty(false);
+//            }
+//        });
+//    }
+//
+    public static void synChroniclerCaps(ItemStack itemStack, PlayerEntity player){
+        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemChronicler){
+            ICapabilityItemList cap_list = getItemListCapability(itemStack);
+            ICapabilityStellarisEnergy energy = getStellarisEnergyCapability(itemStack);
+            ICapabilityInscription inscription = getInscriptionCapability(itemStack);
+            if (cap_list.isDirty() || energy.isDirty() || inscription.isDirty()){
+                ItemChronicler.putCapsTag(itemStack);
+                if (energy.isDirty() && player.containerMenu instanceof ContainerChronicler){
+                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
+                }
+                cap_list.setDirty(false);
+                energy.setDirty(false);
+                inscription.setDirty(false);
+            }
+        }
     }
 
     public static void synInscriptionPlayerCap(ICapabilityInscription inscription, PlayerEntity player){
@@ -72,4 +132,39 @@ public class DataHelper {
         }
         return (CapabilityEffectPlayer) effectPlayer;
     }
+
+//    public static void synItemStackNBT(ItemStack itemStack, PlayerEntity playerEntity){
+//        ChroniclerNetwork.sendToClientPlayer(new SynItemNBTMessage(itemStack),playerEntity);
+//    }
+
+    public static ItemStack getItemStackByID(String id, PlayerInventory inventory){
+        ItemStack target = ItemStack.EMPTY;
+        for (int i=0;i<inventory.getContainerSize();i++){
+            ItemStack item = inventory.getItem(i);
+            if (item.getItem() instanceof ItemChronicler){
+                String id_i = ItemChronicler.getId(item);
+                if (id_i.equals(id)){
+                    return item;
+                }
+            }
+        }
+        return target;
+    }
+
+    public static PlayerEntity getClientPlayerNearby(String uuid){
+        if (Minecraft.getInstance().player != null) {
+            UUID u = UUID.fromString(uuid);
+            return Minecraft.getInstance().player.level.getPlayerByUUID(u);
+        }
+        return null;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static PlayerEntity getClientPlayer(){
+        if (Minecraft.getInstance().player != null) {
+            return Minecraft.getInstance().player;
+        }
+        return null;
+    }
+
 }

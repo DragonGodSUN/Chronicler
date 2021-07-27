@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 
 public class CapabilityInscription implements ICapabilityInscription {
     private String id = "";
@@ -20,17 +21,20 @@ public class CapabilityInscription implements ICapabilityInscription {
     @Override
     public void setInscription(String id) {
         this.id = id;
+        setDirty(true);
     }
 
     @Override
     public void setLevel(int level) {
         this.level = level;
+        setDirty(true);
     }
 
     @Override
     public void reset() {
         this.id = "";
         this.level = 0;
+        setDirty(true);
     }
 
     @Override
@@ -53,7 +57,9 @@ public class CapabilityInscription implements ICapabilityInscription {
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        this.id = nbt.getString("id");
-        this.level = nbt.getInt("level");
+        if (nbt != null) {
+            this.id = nbt.getString("id");
+            this.level = nbt.getInt("level");
+        }
     }
 }

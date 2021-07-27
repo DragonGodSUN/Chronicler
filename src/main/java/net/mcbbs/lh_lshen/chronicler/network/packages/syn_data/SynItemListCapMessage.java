@@ -5,29 +5,33 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class ManageItemListCapMessage {
+public class SynItemListCapMessage {
     private ItemStack itemStackChronicler;
     private ICapabilityItemList capabilityItemList;
 
-    public ManageItemListCapMessage(ItemStack itemStackChronicler, ICapabilityItemList capabilityItemList) {
+    public SynItemListCapMessage(ItemStack itemStackChronicler, ICapabilityItemList capabilityItemList) {
         this.itemStackChronicler = itemStackChronicler;
         this.capabilityItemList = capabilityItemList;
     }
 
-    public static void encode(ManageItemListCapMessage message, PacketBuffer buf) {
+    public static void encode(SynItemListCapMessage message, PacketBuffer buf) {
         if (message.itemStackChronicler != null && message.itemStackChronicler.getItem() instanceof ItemChronicler) {
-            ListNBT listNBT = message.capabilityItemList.serializeNBT();
+            ListNBT listNBT = (ListNBT) message.capabilityItemList.serializeNBT();
             buf.writeItemStack(message.itemStackChronicler,true);
             buf.writeInt(listNBT.size());
             for (int i=0;i<listNBT.size();i++){
@@ -39,7 +43,7 @@ public class ManageItemListCapMessage {
         }
     }
 
-    public static ManageItemListCapMessage decode(PacketBuffer buf) {
+    public static SynItemListCapMessage decode(PacketBuffer buf) {
         ItemStack stack = buf.readItem();
         int size = buf.readInt();
         if (stack.getItem() instanceof ItemChronicler){
@@ -51,24 +55,25 @@ public class ManageItemListCapMessage {
             CapabilityItemList capabilityItemList = new CapabilityItemList();
                 capabilityItemList.deserializeNBT(listNBT);
                 if (capabilityItemList!=null) {
-                    return new ManageItemListCapMessage(stack,capabilityItemList);
+                    return new SynItemListCapMessage(stack,capabilityItemList);
                 }
         }
         return null;
     }
 
-    public static void handler(ManageItemListCapMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide().isServer()) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity sender = ctx.get().getSender();
-            synData(message,sender);
+    public static void handler(SynItemListCapMessage message, Supplier<NetworkEvent.Context> ctx) {
+        if (ctx.get().getDirection().getReceptionSide().isClient()) {
+            ctx.get().enqueueWork(() -> {
+                synData(message);
             });
         }
         ctx.get().setPacketHandled(true);
 
     }
 
-    public static void synData(ManageItemListCapMessage message, PlayerEntity player){
+    @OnlyIn(Dist.CLIENT)
+    public static void synData(SynItemListCapMessage message){
+        PlayerEntity player = DataHelper.getClientPlayer();
         if (player == null) {
             return;
         }
@@ -77,16 +82,15 @@ public class ManageItemListCapMessage {
 
         if (itemStack != null && !itemStack.isEmpty()) {
             ItemStack itemHold = player.getMainHandItem();
-            if (itemHold.getItem() instanceof ItemChronicler) {
+            if (itemHold.getItem() instanceof ItemChronicler
+                && itemHold.equals(message.itemStackChronicler,true)) {
                 LazyOptional<ICapabilityItemList> cap_item = itemHold.getCapability(ModCapability.ITEMLIST_CAPABILITY);
                 cap_item.ifPresent((c) -> {
                     if (cap != null) {
-                        c.deserializeNBT(cap.serializeNBT());
-                        c.setDirty(true);
+                       c.deserializeNBT(cap.serializeNBT());
                     }
                 });
             }
         }
     }
-
 }

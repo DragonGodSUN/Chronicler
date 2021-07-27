@@ -4,6 +4,7 @@ import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.INBTSerializable;
 
@@ -26,5 +27,8 @@ public interface ICapabilityItemList extends INBTSerializable<ListNBT> {
     void setInventoryStar(Inventory inventoryStar);
     void setStar(ItemStack itemStack);
     void removeStar(ItemStack itemStack);
+
+    boolean isDirty();
+    void setDirty(boolean flag);
 
 }

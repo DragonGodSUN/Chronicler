@@ -2,17 +2,13 @@ package net.mcbbs.lh_lshen.chronicler.inventory.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.mcbbs.lh_lshen.chronicler.Utils;
-import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
-import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
-import net.mcbbs.lh_lshen.chronicler.inscription.EnumInscription;
-import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
 import net.mcbbs.lh_lshen.chronicler.inventory.SelectCompnent;
 import net.mcbbs.lh_lshen.chronicler.items.ItemInscription;
@@ -27,12 +23,10 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +66,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     if (selectCompnent.getPage()>0){
                         selectCompnent.prePage();
                         this.menu.selectBoxOpen =false;
-                        synData(chronicler,cap_list);
+                        synItemList(chronicler,cap_list);
                     }
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.page.up"), x, y), StringTextComponent.EMPTY);
@@ -85,7 +79,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     if (selectCompnent.getPage()<pages){
                         selectCompnent.nextPage();
                         this.menu.selectBoxOpen =false;
-                        synData(chronicler,cap_list);
+                        synItemList(chronicler,cap_list);
                     }
                 },
                 (button, matrixStack, x, y) -> renderTooltip(matrixStack, new TranslationTextComponent("gui.chronicler_lh.page.down"), x, y), StringTextComponent.EMPTY);
@@ -120,7 +114,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 if (list_page >0){
                                     selectCompnent.changeStackListPage(finalJ,-1);
                                     this.menu.selectBoxOpen =false;
-                                    synData(chronicler,cap_list);
+                                    synItemList(chronicler,cap_list);
                                 }
                             }
                         }
@@ -138,7 +132,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 if (list_page < slot.container.getContainerSize()/4 -1){
                                     selectCompnent.changeStackListPage(finalJ,1);
                                     this.menu.selectBoxOpen =false;
-                                    synData(chronicler,cap_list);
+                                    synItemList(chronicler,cap_list);
                                 }
                             }
                         }
@@ -177,7 +171,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                     }
                                 }
 
-                                synData(chronicler, cap_list);
+                                synItemList(chronicler, cap_list);
                             }
                         }
                     }
@@ -206,7 +200,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                     selectCompnent.changeStackListPage(selectSlot.getJ_index(),1);
 //                                    synData(chronicler,cap_list);
                                 }
-                                    synData(chronicler,cap_list);
+                                    synItemList(chronicler,cap_list);
                             }
                         }
                     }
@@ -227,7 +221,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 int initSlot = selectSlot.getJ_index()*4;
                                 StoreHelper.setFirstIndex(cap_list, itemStack);
                                 selectCompnent.setStackListPage(selectSlot.getJ_index(),0);
-                                synData(chronicler, cap_list);
+                                synItemList(chronicler, cap_list);
                                 selectCompnent.selectSlot(initSlot);
                             }
                         }
@@ -257,7 +251,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 }else {
                                     selectCompnent.selectSlot = 0;
                                 }
-                                synData(chronicler, cap_list);
+                                synItemList(chronicler, cap_list);
                             }
                         }
                     }
@@ -274,7 +268,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 cap_list.setInventoryStar(inventory);
 
                                 selectCompnent.selectSlot -=1;
-                                synData(chronicler,cap_list);
+                                synItemList(chronicler,cap_list);
                             }
                         }
                     }
@@ -306,7 +300,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                             selectCompnent.selectSlot = 0;
                                         }
                                 }
-                                synData(chronicler, cap_list);
+                                synItemList(chronicler, cap_list);
                             }
                         }
                     }
@@ -325,7 +319,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                             if (selectCompnent.selectSlot+1 < this.menu.STAR_SIZE){
                                 selectCompnent.selectSlot +=1;
                             }
-                            synData(chronicler,cap_list);
+                            synItemList(chronicler,cap_list);
 
                         }
                     }
@@ -337,23 +331,28 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotChronicler
                         && this.menu.selectBoxOpen) {
                         CapabilityItemList cap_list = this.menu.getCapabilityItemList();
+                        CapabilityStellarisEnergy energy = this.menu.getEnergy();
                         SlotChronicler selectSlot = (SlotChronicler) this.menu.slots.get(selectCompnent.selectSlot);
                         ItemStack chronicler = this.menu.getItemStackChronicler();
-                        if (cap_list != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
-                            ItemStack itemStack = selectSlot.getItem();
-                            boolean hasItem = StoreHelper.hasItemStack(cap_list, itemStack);
-                            if (hasItem) {
-                                cap_list.removeStar(itemStack);
-                                StoreHelper.deleteItemStack(cap_list,itemStack);
-                                ItemStack itemPage = ItemRecordPage.getPageStored(itemStack);
-                                if (this.getMinecraft().player!=null) {
-                                    this.getMinecraft().player.inventory.add(itemPage.copy());
+                        if (energy.canCost(1000)) {
+                            if (cap_list != null && selectSlot != null && !selectSlot.getItem().isEmpty()) {
+                                ItemStack itemStack = selectSlot.getItem();
+                                boolean hasItem = StoreHelper.hasItemStack(cap_list, itemStack);
+                                if (hasItem) {
+                                    cap_list.removeStar(itemStack);
+                                    StoreHelper.deleteItemStack(cap_list,itemStack);
+                                    ItemStack itemPage = ItemRecordPage.getPageStored(itemStack);
+                                    if (this.getMinecraft().player!=null) {
+                                        this.getMinecraft().player.inventory.add(itemPage.copy());
+                                    }
+                                        ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(itemPage));
+                                        this.menu.starTriggered = false;
+                                        selectCompnent.setSelectItemStack(ItemStack.EMPTY);
+                                    }
+                                    synItemList(chronicler,cap_list);
                                 }
-                                ChroniclerNetwork.INSTANCE.sendToServer(new ProduceMessage(itemPage));
-                                this.menu.starTriggered = false;
-                                selectCompnent.setSelectItemStack(ItemStack.EMPTY);
-                                synData(chronicler,cap_list);
-                            }
+                            }else {
+                            this.getMinecraft().player.sendMessage(new TranslationTextComponent("message.chronicler.gui.energy.deficiency"), UUID.randomUUID());
                         }
                     }
                     if (this.menu.slots.get(selectCompnent.selectSlot) instanceof SlotInscription
@@ -374,9 +373,10 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                                 inscription.reset();
                                 selectCompnent.setSelectItemStack(ItemStack.EMPTY);
                                 this.menu.starTriggered = false;
+                                this.menu.selectBoxOpen = false;
                                 synInscription(this.menu.getItemStackChronicler(), (CapabilityInscription) inscription);
                                 synEnergy(this.menu.getItemStackChronicler(), (CapabilityStellarisEnergy) energy);
-                                synData(this.menu.getItemStackChronicler(), (CapabilityItemList) cap_list);
+                                synItemList(this.menu.getItemStackChronicler(), (CapabilityItemList) cap_list);
                             }
 
                         }
@@ -395,7 +395,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                         selectCompnent.setSelectItemStack(ItemStack.EMPTY);
                         this.menu.starTriggered = false;
                         this.menu.selectBoxOpen = false;
-                        synData(chronicler,cap_list);
+                        synItemList(chronicler,cap_list);
 
                     }
                 },
@@ -446,7 +446,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
 
     @Override
     public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {
-        if (this.menu.selectBoxOpen && !this.menu.slots.get(selectCompnent.selectSlot).getItem().isEmpty()){
+        if (this.menu.selectBoxOpen && selectCompnent.selectSlot < this.menu.slots.size()&&!this.menu.slots.get(selectCompnent.selectSlot).getItem().isEmpty()){
             CapabilityItemList cap_list = this.menu.getCapabilityItemList();
             ItemStack chronicler = this.menu.getItemStackChronicler();
             if (this.star.mouseClicked(p_231044_1_,p_231044_3_,p_231044_5_)) {
@@ -460,7 +460,7 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
                     cap_list.removeStar(selectItem);
                     this.menu.starTriggered = false;
                 }
-                synData(chronicler,cap_list);
+                synItemList(chronicler,cap_list);
 //                boolean flag =false;
 //                int index = -1;
 //
@@ -562,9 +562,10 @@ public class ChroniclerGUI extends ContainerScreen<ContainerChronicler> {
         getMinecraft().font.draw(matrixStack, ""+point, leftPos + 83, topPos + 23, TextFormatting.AQUA.getColor());
     }
 
-    public void synData(ItemStack chronicler, CapabilityItemList capabilityItemList){
+    public void synItemList(ItemStack chronicler, CapabilityItemList capabilityItemList){
         capabilityItemList.markDirty();
         this.menu.setCapabilityItemList(capabilityItemList);
+        StoreHelper.synItemListCapabilityToSever(chronicler,capabilityItemList);
         this.menu.broadcastChanges();
     }
 

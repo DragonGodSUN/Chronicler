@@ -14,16 +14,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class ManageInscriptionCapMessage {
+public class SynInscriptionCapMessage {
     private ICapabilityInscription inscription;
     private ItemStack stack;
 
-    public ManageInscriptionCapMessage(ItemStack stack, ICapabilityInscription inscription) {
+    public SynInscriptionCapMessage(ItemStack stack, ICapabilityInscription inscription) {
         this.stack = stack;
         this.inscription = inscription;
     }
 
-    public static void encode(ManageInscriptionCapMessage message, PacketBuffer buf) {
+    public static void encode(SynInscriptionCapMessage message, PacketBuffer buf) {
         if (message.stack !=null && message.inscription != null) {
             CompoundNBT compoundNBT = (CompoundNBT) message.inscription.serializeNBT();
             buf.writeItemStack(message.stack,false);
@@ -31,38 +31,38 @@ public class ManageInscriptionCapMessage {
         }
     }
 
-    public static ManageInscriptionCapMessage decode(PacketBuffer buf) {
+    public static SynInscriptionCapMessage decode(PacketBuffer buf) {
         ItemStack stack = buf.readItem();
         CompoundNBT nbt = buf.readNbt();
         CapabilityInscription inscription = new CapabilityInscription();
         inscription.deserializeNBT(nbt);
         if (inscription!=null) {
-            return new ManageInscriptionCapMessage(stack,inscription);
+            return new SynInscriptionCapMessage(stack,inscription);
         }
         return null;
     }
 
-    public static void handler(ManageInscriptionCapMessage message, Supplier<NetworkEvent.Context> ctx) {
-        if (ctx.get().getDirection().getReceptionSide().isServer()) {
+    public static void handler(SynInscriptionCapMessage message, Supplier<NetworkEvent.Context> ctx) {
+        if (ctx.get().getDirection().getReceptionSide().isClient()) {
             ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity sender = ctx.get().getSender();
-                synData(message,sender);
+                synData(message);
             });
         }
         ctx.get().setPacketHandled(true);
     }
 
-    public static void synData(ManageInscriptionCapMessage message, PlayerEntity player){
+    public static void synData(SynInscriptionCapMessage message){
+        PlayerEntity player = DataHelper.getClientPlayer();
         if (player == null) {
             return;
         }
         CapabilityInscription cap = (CapabilityInscription) message.inscription;
         ItemStack hold = player.getMainHandItem();
-        if (hold.getItem() instanceof ItemChronicler){
+        if (hold.getItem() instanceof ItemChronicler
+            && hold.equals(message.stack,true)){
             ICapabilityInscription inscription = hold.getCapability(ModCapability.INSCRIPTION_CAPABILITY).orElse(null);
             if (cap!=null && inscription!=null){
                 inscription.deserializeNBT(cap.serializeNBT());
-                inscription.setDirty(true);
             }
         }
     }
