@@ -30,5 +30,6 @@ public interface ICapabilityItemList extends INBTSerializable<ListNBT> {
 
     boolean isDirty();
     void setDirty(boolean flag);
+    void loadIfNotLoaded(ItemStack stack);
 
 }

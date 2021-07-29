@@ -1,6 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 
@@ -8,6 +9,7 @@ public class CapabilityInscription implements ICapabilityInscription {
     private String id = "";
     private int level;
     private boolean isDirty;
+    private boolean isLoaded;
     @Override
     public String getInscription() {
         return id;
@@ -45,6 +47,15 @@ public class CapabilityInscription implements ICapabilityInscription {
     @Override
     public void setDirty(boolean isDirty) {
         this.isDirty = isDirty;
+    }
+
+    @Override
+    public void loadIfNotLoaded(ItemStack stack) {
+        if (!isLoaded){
+            CompoundNBT nbt_inscription = stack.getOrCreateTag().getCompound("inscription");
+            deserializeNBT(nbt_inscription);
+            isLoaded =true;
+        }
     }
 
     @Override

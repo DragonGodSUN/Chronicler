@@ -4,17 +4,14 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
-import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
-import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.capabilities.provider.ItemChroniclerProvider;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.helper.StoreHelper;
 import net.mcbbs.lh_lshen.chronicler.inscription.IInscription;
 import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.inventory.ContainerChronicler;
-import net.mcbbs.lh_lshen.chronicler.network.ChroniclerNetwork;
-import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynItemNBTInHandMessage;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
@@ -39,7 +36,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.lwjgl.glfw.GLFW;
 
@@ -57,15 +53,18 @@ public class ItemChronicler extends Item {
     @Override
     public void inventoryTick(ItemStack itemStack, World world, Entity entity, int tick, boolean flag) {
         if (entity instanceof PlayerEntity) {
+            DataHelper.capsUpdae(itemStack);
             if (!world.isClientSide()) {
                 ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(itemStack);
-                energy.charge(1);
-                ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
-                IInscription iInscription = InscriptionRegister.getInscription(inscription.getInscription());
-                if (iInscription!=null){
-                    iInscription.tickEffect(entity,itemStack);
+                if (isOpen(itemStack, (PlayerEntity) entity)) {
+                    energy.charge(1);
+                    ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
+                    IInscription iInscription = InscriptionRegister.getInscription(inscription.getInscription());
+                    if (iInscription!=null){
+                        iInscription.tickEffect(entity,itemStack);
+                    }
+                    DataHelper.synChroniclerCaps(itemStack, (PlayerEntity) entity);
                 }
-                DataHelper.synChroniclerCaps(itemStack, (PlayerEntity) entity);
             }
         }
         super.inventoryTick(itemStack, world, entity, tick, flag);
@@ -85,24 +84,24 @@ public class ItemChronicler extends Item {
         ItemStack itemStack = playerEntity.getMainHandItem();
         ItemStack itemStack_l = playerEntity.getOffhandItem();
         if (itemStack.getItem() instanceof ItemChronicler) {
-        LazyOptional<ICapabilityItemList> capability = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY);
-        capability.ifPresent((cap_list)->{
-            if (playerEntity.isShiftKeyDown()) {
-                loadPage(itemStack_l, world, playerEntity,cap_list);
-                loadInscription(itemStack_l,itemStack,world,playerEntity);
-            }else {
-                if (!world.isClientSide ()) {
-                    if (!isOpen(itemStack,playerEntity)){
-                        String id = UUID.randomUUID().toString();
-                        setId(itemStack,id);
-                    }
-                    ChroniclerNetwork.sendToClientPlayer(new SynItemNBTInHandMessage(itemStack),playerEntity);
-                    openGUI(itemStack, (ServerPlayerEntity) playerEntity);
+        ICapabilityItemList cap_list = DataHelper.getItemListCapability(itemStack);
+        ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(itemStack);
+        if (playerEntity.isShiftKeyDown()) {
+            loadPage(itemStack_l, world, playerEntity,cap_list);
+            loadInscription(itemStack_l,itemStack,world,playerEntity);
+        }else {
+            if (!world.isClientSide ()) {
+                if (!isOpen(itemStack,playerEntity)){
+                    String id = UUID.randomUUID().toString();
+                    setId(itemStack,id);
+                    energy.resetMax();
+                    DataHelper.synChroniclerCaps(itemStack, playerEntity);
                 }
-
-            playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
+                openGUI(itemStack, (ServerPlayerEntity) playerEntity);
             }
-        });
+            playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
+        }
+
             return ActionResult.success(itemStack);
         }
         return super.use(world,playerEntity,hand);
@@ -123,7 +122,9 @@ public class ItemChronicler extends Item {
                 size++;
             }
         }
-        tooltips.add(new StringTextComponent(getId(itemStack)));
+        if (isKeyDown) {
+            tooltips.add(new StringTextComponent(TextFormatting.GRAY+getId(itemStack)));
+        }
         tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy",""+TextFormatting.AQUA+energy.getEnergyPoint()));
         if (isKeyDown){
             tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy.max",""+TextFormatting.AQUA+energy.getEnergyMax()));
@@ -199,8 +200,8 @@ public class ItemChronicler extends Item {
             ItemStack storeItem = ((ItemRecordPage) off.getItem()).getStoreItem(off);
             if (!storeItem.isEmpty()){
                 if (!StoreHelper.hasItemStack(cap_list,storeItem)) {
-                    StoreHelper.addItemStack(cap_list,storeItem);
                     if (!world.isClientSide) {
+                        StoreHelper.addItemStack(cap_list,storeItem);
                         off.shrink(1);
                     }
                     if (world.isClientSide ) {
@@ -247,78 +248,33 @@ public class ItemChronicler extends Item {
         return true;
     }
 
-    public static void putCapsTag(ItemStack stack) {
-        CompoundNBT baseTag = stack.getOrCreateTag();
-
-        CapabilityItemList cap_list = DataHelper.getItemListCapability(stack);
-        CapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
-        CapabilityInscription inscription = DataHelper.getInscriptionCapability(stack);
-
-        ListNBT nbt_list = cap_list.serializeNBT();
-        CompoundNBT nbt_energy = energy.serializeNBT();
-        CompoundNBT nbt_inscription = inscription.serializeNBT();
-
-        int size = nbt_list.size();
-        baseTag.putInt("cap_list:size",size);
-        for (int i=0;i<size;i++){
-            CompoundNBT e = nbt_list.getCompound(i);
-            baseTag.put("cap_list:"+i,e);
-        }
-        baseTag.put("energy",nbt_energy);
-        baseTag.put("inscription",nbt_inscription);
-
-        stack.setTag(baseTag);
-    }
-
-    public static void readCapsTag(ItemStack stack, @Nullable CompoundNBT nbt) {
-        stack.setTag(nbt);
-        CapabilityItemList cap_list = DataHelper.getItemListCapability(stack);
-        CapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
-        CapabilityInscription inscription = DataHelper.getInscriptionCapability(stack);
-
-        ListNBT nbt_list = new ListNBT();
-        int size = nbt.getInt("cap_list:size");
-        for (int i = 0;i<size;i++){
-            CompoundNBT eNBT = nbt.getCompound("cap_list:"+i);
-            nbt_list.add(eNBT);
-        }
-        cap_list.deserializeNBT(nbt_list);
-
-        CompoundNBT nbt_energy = nbt.getCompound("energy");
-        energy.deserializeNBT(nbt_energy);
-
-        CompoundNBT nbt_inscription = nbt.getCompound("inscription");
-        inscription.deserializeNBT(nbt_inscription);
-    }
-
-
-//    @Nullable
-//    @Override
-//    public CompoundNBT getShareTag(ItemStack stack) {
-//        CompoundNBT nbt = new CompoundNBT();
-//        putCapsTag(stack);
+    @Nullable
+    @Override
+    public CompoundNBT getShareTag(ItemStack stack) {
+//        NBTHelper.putCapsTag(stack);
 //        if (stack.getTag()!=null) {
-//            nbt.put("nbtTags",stack.getTag());
+//            return stack.getTag();
 //        }
-//        return nbt;
-//    }
-//
+        return super.getShareTag(stack);
+    }
+
+
     @Override
     public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
         if (nbt == null) {
             stack.setTag(null);
             return;
         }
-        readCapsTag(stack,nbt);
+        NBTHelper.readCapsTag(stack,nbt);
     }
 
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
         ItemChroniclerProvider provider = new ItemChroniclerProvider();
-//        if (nbt!=null) {
-//            provider.deserializeNBT(nbt);
-//        }
+        if (stack.getTag()!=null) {
+            provider.deserializeNBT(stack.getTag());
+        }
             return provider;
     }
 

@@ -34,6 +34,7 @@ public class SynItemNBTInHandMessage extends BasicMessage {
                 ItemStack hold = player.getMainHandItem();
                 if (itemStack != null && hold.getItem().equals(itemStack.getItem())) {
                     hold.setTag(itemStack.getOrCreateTag());
+                    hold.readShareTag(itemStack.getOrCreateTag());
                 }
             });
         }

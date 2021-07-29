@@ -11,6 +11,7 @@ import net.mcbbs.lh_lshen.chronicler.network.packages.syn_data.SynEffectPlayerMe
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.LazyOptional;
@@ -47,18 +48,19 @@ public final class CapabilityEvent {
         }
     }
 //
-    @SubscribeEvent
-    public static void onItemUptateEvent(TickEvent.PlayerTickEvent event) {
+//    @SubscribeEvent
+//    public static void onItemUptateEvent(TickEvent.PlayerTickEvent event) {
 //        PlayerEntity player = event.player;
-//        if (!player.level.isClientSide()) {
-//            for (int i=0;i<player.inventory.getContainerSize();i++) {
-//                ItemStack stack = player.inventory.getItem(i);
-//                if (stack.getItem() instanceof ItemChronicler && ItemChronicler.isOpen(stack,player)){
-//                    DataHelper.synChroniclerCaps(stack, player);
-//                }
+//        for (int i=0;i<player.inventory.getContainerSize();i++) {
+//            ItemStack stack = player.inventory.getItem(i);
+//            if (stack.getItem() instanceof ItemChronicler){
+//                CompoundNBT nbt = stack.getOrCreateTag();
+//                long dirtyCounter = nbt.getLong("dirtyCounter");
+//                nbt.putLong("dirtyCounter", dirtyCounter + 1);
+//                stack.setTag(nbt);
 //            }
 //        }
-    }
+//    }
 
 
     @SubscribeEvent

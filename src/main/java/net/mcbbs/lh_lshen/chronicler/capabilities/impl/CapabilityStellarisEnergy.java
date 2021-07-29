@@ -1,6 +1,7 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 
@@ -8,6 +9,7 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     private int energy;
     private int maxEnergy = 10000;
     private boolean isDirty;
+    private boolean isLoaded;
     @Override
     public int getEnergyPoint() {
         return energy;
@@ -80,6 +82,15 @@ public class CapabilityStellarisEnergy implements ICapabilityStellarisEnergy {
     @Override
     public void setDirty(boolean isDirty) {
         this.isDirty = isDirty;
+    }
+
+    @Override
+    public void loadIfNotLoaded(ItemStack stack) {
+        if (!isLoaded){
+            CompoundNBT nbt_energy = stack.getOrCreateTag().getCompound("energy");
+            deserializeNBT(nbt_energy);
+            isLoaded =true;
+        }
     }
 
     @Override

@@ -19,4 +19,10 @@ public class ModCapability {
 
     @CapabilityInject(ICapabilityEffectPlayer.class)
     public static Capability<ICapabilityEffectPlayer> EFFECT_PLAYER = null;
+
+    public static class NBT_TAGS {
+        public final static String TAG_CAP_LIST = "cap_list";
+        public final static String TAG_CAP_ENERGY = "energy";
+        public final static String TAG_CAP_INSCRIPTION = "inscription";
+    }
 }

@@ -2,7 +2,9 @@ package net.mcbbs.lh_lshen.chronicler.capabilities.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,6 +20,7 @@ public class CapabilityItemList implements ICapabilityItemList {
     private List<String> keyList = Lists.newArrayList();
     private Inventory inventoryStar = new Inventory(8);
     private boolean isDirty;
+    private boolean isLoaded;
 
     public CapabilityItemList() {
     }
@@ -193,6 +196,16 @@ public class CapabilityItemList implements ICapabilityItemList {
         isDirty = dirty;
     }
 
+    @Override
+    public void loadIfNotLoaded(ItemStack stack) {
+        if (!isLoaded){
+            CompoundNBT nbt_list = stack.getOrCreateTag().getCompound(ModCapability.NBT_TAGS.TAG_CAP_LIST);
+            ListNBT listNBT = NBTHelper.deserializeCapList(ModCapability.NBT_TAGS.TAG_CAP_LIST,nbt_list);
+            deserializeNBT(listNBT);
+            isLoaded = true;
+        }
+    }
+
     public void markDirty(){
         setDirty(true);
     }
@@ -200,34 +213,60 @@ public class CapabilityItemList implements ICapabilityItemList {
     @Override
     public ListNBT serializeNBT() {
         ListNBT nbtTagList = new ListNBT();
-        for(Map.Entry<String, List<ItemStack>> entry:itemAllMap.entrySet()){
-            for (ItemStack itemStack:entry.getValue()){
-                CompoundNBT itemTag = new CompoundNBT();
-                itemTag.putString("type","lib");
-                itemTag.putString("item_id",entry.getKey());
-                itemStack.save(itemTag);
-                nbtTagList.add(itemTag);
-            }
-        }
 
+        CompoundNBT libs = new CompoundNBT();
+        libs.putString("type","lib");
+        int list_index = 0;
+        for(Map.Entry<String, List<ItemStack>> entry:itemAllMap.entrySet()){
+            List<ItemStack> list = entry.getValue();
+            CompoundNBT lib = new CompoundNBT();
+            lib.putInt("size",list.size());
+            for (int i=0;i<list.size();i++){
+                CompoundNBT itemTag = new CompoundNBT();
+                ItemStack stack = list.get(i);
+                stack.save(itemTag);
+                lib.put("item:"+i,itemTag);
+            }
+            libs.putString("id:"+list_index,entry.getKey());
+            libs.put(entry.getKey(),lib);
+            list_index++;
+        }
+        nbtTagList.add(libs);
+        libs.putInt("size",list_index);
+//            for (ItemStack itemStack:entry.getValue()){
+//                CompoundNBT itemTag = new CompoundNBT();
+//                itemTag.putString("type","lib");
+//                itemTag.putString("item_id",entry.getKey());
+//                itemStack.save(itemTag);
+//                nbtTagList.add(itemTag);
+//            }
+
+        CompoundNBT stars = new CompoundNBT();
+        stars.putString("type","star");
+        stars.putInt("size",this.inventoryStar.getContainerSize());
         for (int i=0;i<this.inventoryStar.getContainerSize();i++){
             ItemStack stack = this.inventoryStar.getItem(i);
             CompoundNBT invTag = new CompoundNBT();
-            invTag.putString("type","star");
             stack.save(invTag);
-            nbtTagList.add(invTag);
+            stars.put("item:"+i,invTag);
+//            invTag.putString("type","star");
+//            nbtTagList.add(invTag);
         }
+        nbtTagList.add(stars);
 
-        for (String id:keyList){
-            CompoundNBT idTag = new CompoundNBT();
-            idTag.putString("type","key");
-            idTag.putString("id_config",id);
-            nbtTagList.add(idTag);
+        CompoundNBT keys = new CompoundNBT();
+        keys.putString("type","key");
+        keys.putInt("size",keyList.size());
+        for (int i=0;i<keyList.size();i++){
+            String id = keyList.get(i);
+            keys.putString("key:"+i,id);
         }
-            CompoundNBT idUUTag = new CompoundNBT();
-            idUUTag.putString("type","uuid");
-            idUUTag.putString("uuid",this.uuid);
-            nbtTagList.add(idUUTag);
+        nbtTagList.add(keys);
+//            nbtTagList.add(idTag);
+        CompoundNBT idUUTag = new CompoundNBT();
+        idUUTag.putString("type","uuid");
+        idUUTag.putString("uuid",this.uuid);
+        nbtTagList.add(idUUTag);
         return nbtTagList;
     }
 
@@ -245,23 +284,44 @@ public class CapabilityItemList implements ICapabilityItemList {
                     CompoundNBT itemNbt = (CompoundNBT) tag;
                     String type = itemNbt.getString("type");
                     if (type.equals("lib")) {
-                        String id = itemNbt.getString("item_id");
-                        ItemStack stack = ItemStack.of(itemNbt);
-                        if (!stack.isEmpty()) {
-                            id_list.add(id);
-                            if (!itemStackList.contains(stack)) {
-                                itemStackList.add(stack);
+                        CompoundNBT libs = itemNbt;
+                        int size = libs.getInt("size");
+                        for (int i=0;i<size;i++) {
+                            String key = libs.getString("id:"+i);
+                            id_list.add(key);
+                        }
+                        for (String id : id_list) {
+                            CompoundNBT lib = libs.getCompound(id);
+                            int l_size = lib.getInt("size");
+                            for (int i=0;i<l_size;i++){
+                                CompoundNBT itemTag = lib.getCompound("item:"+i);
+                                ItemStack stack = ItemStack.of(itemTag);
+                                if (!stack.isEmpty()) {
+                                    if (!itemStackList.contains(stack)) {
+                                        itemStackList.add(stack);
+                                    }
+                                }
                             }
                         }
                     }
                     if (type.equals("star")) {
-                        ItemStack stack = ItemStack.of(itemNbt);
-                        inventory_nbt.addItem(stack);
+                        CompoundNBT stars = itemNbt;
+                        int size = stars.getInt("size");
+                        for (int i=0;i<size;i++){
+                            CompoundNBT invTag = stars.getCompound("item:"+i);
+                            ItemStack stack = ItemStack.of(invTag);
+                            inventory_nbt.addItem(stack);
+                        }
                     }
+
                     if (type.equals("key")) {
-                    String id_config = itemNbt.getString("id_config");
-                    if (id_list.contains(id_config)) {
-                        itemStackConfigList.add(id_config);
+                        CompoundNBT keys = itemNbt;
+                        int size = keys.getInt("size");
+                        for (int i=0;i<size;i++){
+                            String id_config = keys.getString("key:"+i);
+                            if (id_list.contains(id_config)) {
+                                itemStackConfigList.add(id_config);
+                            }
                         }
                     }
                     if (type.equals("uuid")) {

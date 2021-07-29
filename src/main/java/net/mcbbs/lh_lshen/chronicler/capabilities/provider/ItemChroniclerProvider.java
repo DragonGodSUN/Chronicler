@@ -7,6 +7,9 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
+import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -70,35 +73,37 @@ public class ItemChroniclerProvider implements ICapabilityProvider, INBTSerializ
 
     @Override
     public INBT serializeNBT() {
-        ListNBT listNBT = new ListNBT();
-        CompoundNBT size = new CompoundNBT();
-        size.putInt("cap_list_size",((ListNBT)getCapItemList().serializeNBT()).size());
-        listNBT.add(size);
-//        listNBT.add(ModCapability.ITEMLIST_CAPABILITY.writeNBT(cap_instance,null));
-//        listNBT.add(ModCapability.ENERGY_CAPABILITY.writeNBT(energy_instance,null));
-//        listNBT.add(ModCapability.INSCRIPTION_CAPABILITY.writeNBT(inscription_instance,null));
-        listNBT.addAll(getCapItemList().serializeNBT());
-        listNBT.add(getCapEnergy().serializeNBT());
-        listNBT.add(getCapInscription().serializeNBT());
-        return listNBT;
+        CompoundNBT tag = new CompoundNBT();
+
+        ICapabilityItemList cap_list = getCapItemList();
+        ICapabilityStellarisEnergy energy = getCapEnergy();
+        ICapabilityInscription inscription = getCapInscription();
+
+        ListNBT listNBT = cap_list.serializeNBT();
+        CompoundNBT nbt_list = NBTHelper.serializeCapList(listNBT,ModCapability.NBT_TAGS.TAG_CAP_LIST,new CompoundNBT());
+        CompoundNBT nbt_energy = energy.serializeNBT();
+        CompoundNBT nbt_inscription = inscription.serializeNBT();
+
+        tag.put(ModCapability.NBT_TAGS.TAG_CAP_LIST,nbt_list);
+        tag.put(ModCapability.NBT_TAGS.TAG_CAP_ENERGY,nbt_energy);
+        tag.put(ModCapability.NBT_TAGS.TAG_CAP_INSCRIPTION,nbt_inscription);
+
+        return tag;
     }
 
     @Override
     public void deserializeNBT(INBT nbt) {
-        if (nbt instanceof ListNBT){
-            ListNBT listNBT = (ListNBT) nbt;
-            ListNBT cap_list = new ListNBT();
-            int size = ((CompoundNBT)(listNBT.get(0))).getInt("cap_list_size");
-//            ModCapability.ITEMLIST_CAPABILITY.readNBT(cap_instance,null,listNBT.get(0));
-//            ModCapability.ENERGY_CAPABILITY.readNBT(energy_instance,null,listNBT.get(1));
-//            ModCapability.INSCRIPTION_CAPABILITY.readNBT(inscription_instance,null,listNBT.get(2));
-            for (int i=0;i<size;i++){
-                cap_list.add(listNBT.get(i+1));
-            }
-            getCapItemList().deserializeNBT(cap_list);
-            getCapEnergy().deserializeNBT((CompoundNBT) listNBT.get(size+1));
-            getCapInscription().deserializeNBT((CompoundNBT) listNBT.get(size+2));
-        }
+       if (nbt instanceof CompoundNBT) {
+            CompoundNBT nbt_list = ((CompoundNBT) nbt).getCompound(ModCapability.NBT_TAGS.TAG_CAP_LIST);
+            ListNBT list = NBTHelper.deserializeCapList(ModCapability.NBT_TAGS.TAG_CAP_LIST, ((CompoundNBT) nbt_list));
+            getCapItemList().deserializeNBT(list);
+
+           CompoundNBT nbt_energy = ((CompoundNBT) nbt).getCompound(ModCapability.NBT_TAGS.TAG_CAP_ENERGY);
+           getCapEnergy().deserializeNBT(nbt_energy);
+
+           CompoundNBT nbt_inscription = ((CompoundNBT) nbt).getCompound(ModCapability.NBT_TAGS.TAG_CAP_INSCRIPTION);
+           getCapInscription().deserializeNBT(nbt_inscription);
+       }
 
     }
 

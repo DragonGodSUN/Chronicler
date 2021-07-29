@@ -2,6 +2,7 @@ package net.mcbbs.lh_lshen.chronicler.network.packages.syn_data;
 
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -43,7 +44,6 @@ public class SynChroniclerMessage {
         ctx.get().setPacketHandled(true);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void synTagMessage(SynChroniclerMessage message){
         PlayerEntity player = DataHelper.getClientPlayer();
         if (player == null) {

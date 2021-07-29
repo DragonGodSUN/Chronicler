@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.capabilities.api;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
@@ -18,4 +19,5 @@ public interface ICapabilityStellarisEnergy extends INBTSerializable<CompoundNBT
     void reset();
     boolean isDirty();
     void setDirty(boolean isDirty);
+    void loadIfNotLoaded(ItemStack stack);
 }
