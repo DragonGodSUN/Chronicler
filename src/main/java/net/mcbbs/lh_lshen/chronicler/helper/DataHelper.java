@@ -60,20 +60,20 @@ public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity playe
             ICapabilityStellarisEnergy energy = getStellarisEnergyCapability(itemStack);
             ICapabilityInscription inscription = getInscriptionCapability(itemStack);
             if (!player.level.isClientSide()) {
-                if (cap_list.isDirty() || energy.isDirty() || inscription.isDirty()){
+                if (energy.isDirty()&&player.tickCount%10 == 0 || cap_list.isDirty() || inscription.isDirty()) {
                     NBTHelper.putCapsTag(itemStack);
                     if (player.getMainHandItem().equals(itemStack)){
                         ChroniclerNetwork.sendToClientPlayer(new SynItemNBTInHandMessage(itemStack), player);
                     }else {
                         ChroniclerNetwork.sendToClientPlayer(new SynChroniclerMessage(itemStack),player);
-
-                    }
-                    if (energy.isDirty() && player.containerMenu instanceof ContainerChronicler){
-                        ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
                     }
                   cap_list.setDirty(false);
                   energy.setDirty(false);
                   inscription.setDirty(false);
+                }
+                if (energy.isDirty() && player.containerMenu instanceof ContainerChronicler){
+                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
+                    energy.setDirty(false);
                 }
             }
         }

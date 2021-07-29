@@ -27,6 +27,7 @@ public class InscriptionDarkMatterDrive implements IInscription {
             if (energy.getEnergyMax()!=max ) {
                 energy.setEnergyMax(max);
             }
+            energy.charge(2);
         }
     }
 
