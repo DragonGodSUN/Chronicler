@@ -196,6 +196,24 @@ public class StoreHelper {
         return flag;
     }
 
+    public static int getSize(ICapabilityItemList list){
+        int size = 0;
+        for (Map.Entry<String,List<ItemStack>> stacks:list.getAllMap().entrySet()){
+            for (ItemStack stack : stacks.getValue()){
+                size++;
+            }
+        }
+        return size;
+    }
+
+    public static int getType(ICapabilityItemList list){
+        int type = 0;
+        for (Map.Entry<String,List<ItemStack>> stacks:list.getAllMap().entrySet()){
+            type++;
+        }
+        return type;
+    }
+
     public static void synItemListCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
         ChroniclerNetwork.INSTANCE.sendToServer(new ManageItemListCapMessage(chronicler,capabilityItemList));
     }

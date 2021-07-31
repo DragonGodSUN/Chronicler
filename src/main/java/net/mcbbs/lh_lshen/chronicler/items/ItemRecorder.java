@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import net.mcbbs.lh_lshen.chronicler.Config;
 import net.mcbbs.lh_lshen.chronicler.ItemRegistry;
 import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.tabs.ModGroup;
@@ -41,9 +42,16 @@ public class ItemRecorder extends Item {
                         || off.getItem() instanceof ItemInscription || off.getItem() instanceof ItemRecorder){
                     if (world.isClientSide) {
                         player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.item"), UUID.randomUUID());
+                        player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.scala",off.getTag().toString().length()), UUID.randomUUID());
                     }
                     return ActionResult.fail(base);
-                } else {
+                }else if (off.getTag()!=null&&off.getTag().toString().length()> Config.NBT_MAX.get()){
+                    if (world.isClientSide) {
+                        player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.huge"), UUID.randomUUID());
+                        player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.scala",off.getTag().toString().length()), UUID.randomUUID());
+                    }
+                    return ActionResult.fail(base);
+                }else {
                     ItemStack storePage = ItemRecordPage.getPageStored(off.copy());
                     if (!player.level.isClientSide) {
                         double chance = MathHelper.nextDouble(new Random(),0.0,100);
@@ -54,6 +62,7 @@ public class ItemRecorder extends Item {
                             }else {
                                 server_player.drop(storePage,true);
                             }
+                            server_player.sendMessage(new TranslationTextComponent("message.chronicler_lh.recorder.fail.scala",off.getTag().toString().length()), UUID.randomUUID());
                             server_player.playNotifySound(SoundEvents.PLAYER_LEVELUP, SoundCategory.PLAYERS,1f,1f);
                         }else {
                             server_player.playNotifySound(SoundEvents.ITEM_BREAK, SoundCategory.PLAYERS,1f,1f);

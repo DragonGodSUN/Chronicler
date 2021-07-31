@@ -7,7 +7,10 @@
 
   "message.chronicler_lh.chronicler.inscription.load": "刻印加载:%s",
   "message.chronicler_lh.chronicler.item_list.store": "存储:%s",
+  "message.chronicler_lh.chronicler.item_list.fail.max": "已达到其存储上限，可通过修改配置文件的方式更改上限",
   "message.chronicler_lh.recorder.fail.item":"无法记录书页、刻印以及记录者的信息",
+  "message.chronicler_lh.recorder.fail.huge": "所记录物品的NBT大小过大，可通过修改配置文件的方式更改上限",
+  "message.chronicler_lh.recorder.fail.scala": "存储NBT大小：%s",
   "message.chronicler_lh.inscription.hope_flower.load": "团长，车已经准备好了",
   "message.chronicler.gui.energy.deficiency": "星能不足",
   "message.chronicler.gui.produce.inscription": "刻印无法被制造",
@@ -65,5 +68,9 @@
   "effect.chronicler_lh.hope_flower": "希望之花",
 
   "death.attack.cannotStop": "%s停不下来了",
-  "death.attack.cannotStop.player": "%s停不下来了"
+  "death.attack.cannotStop.player": "%s停不下来了",
+
+  "config.chronicler_lh.general_settings": "一般设置",
+  "config.chronicler_lh.store_max": "可存储物品上限",
+  "config.chronicler_lh.nbt_max": "可记录NBT大小上限"
 }

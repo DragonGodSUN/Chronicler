@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.items;
 
+import net.mcbbs.lh_lshen.chronicler.Config;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
@@ -111,17 +112,11 @@ public class ItemChronicler extends Item {
     public void appendHoverText(ItemStack itemStack, @Nullable World world, List<ITextComponent> tooltips, ITooltipFlag flag) {
         super.appendHoverText(itemStack, world, tooltips, flag);
         boolean isKeyDown = InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT);
-        int type = 0;
-        int size = 0;
         ICapabilityItemList list = DataHelper.getItemListCapability(itemStack);
         ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(itemStack);
         ICapabilityInscription inscription = DataHelper.getInscriptionCapability(itemStack);
-        for (Map.Entry<String,List<ItemStack>> stacks:list.getAllMap().entrySet()){
-            type++;
-            for (ItemStack stack : stacks.getValue()){
-                size++;
-            }
-        }
+        int type = StoreHelper.getType(list);
+        int size = StoreHelper.getSize(list);
         if (isKeyDown) {
             tooltips.add(new StringTextComponent(TextFormatting.GRAY+getId(itemStack)));
         }
@@ -199,14 +194,20 @@ public class ItemChronicler extends Item {
         if (off.getItem() instanceof ItemRecordPage){
             ItemStack storeItem = ((ItemRecordPage) off.getItem()).getStoreItem(off);
             if (!storeItem.isEmpty()){
-                if (!StoreHelper.hasItemStack(cap_list,storeItem)) {
-                    if (!world.isClientSide) {
-                        StoreHelper.addItemStack(cap_list,storeItem);
-                        off.shrink(1);
+                if (StoreHelper.getSize(cap_list)<= Config.STORE_MAX.get()) {
+                    if (!StoreHelper.hasItemStack(cap_list,storeItem)) {
+                        if (!world.isClientSide) {
+                            StoreHelper.addItemStack(cap_list,storeItem);
+                            off.shrink(1);
+                        }
+                        if (world.isClientSide ) {
+                        playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.item_list.store",storeItem.getDisplayName().getString()), UUID.randomUUID());
+                        playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
+                        }
                     }
-                    if (world.isClientSide ) {
-                    playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.item_list.store",storeItem.getDisplayName().getString()), UUID.randomUUID());
-                    playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,1f,1f);
+                }else {
+                    if (!world.isClientSide ) {
+                        playerEntity.sendMessage(new TranslationTextComponent("message.chronicler_lh.chronicler.item_list.fail.max"), UUID.randomUUID());
                     }
                 }
             }

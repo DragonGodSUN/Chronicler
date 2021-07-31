@@ -7,7 +7,10 @@
 
   "message.chronicler_lh.chronicler.inscription.load": "Inscription Load:%s",
   "message.chronicler_lh.chronicler.item_list.store": "Store:%s",
+  "message.chronicler_lh.chronicler.item_list.fail.max": "The chronicler can't save more item, you can change the limit by modifying config file",
   "message.chronicler_lh.recorder.fail.item":"Unable to record information of page, inscription, or chronicler",
+  "message.chronicler_lh.recorder.fail.huge": "The NBT length is too huge to store, you can change the limit by modifying config file",
+  "message.chronicler_lh.recorder.fail.scala": "NBT length: %s",
   "message.chronicler_lh.inscription.hope_flower.load": "Colonel! The car is ready!",
   "message.chronicler.gui.energy.deficiency": "Stellasris Energy is not enough",
   "message.chronicler.gui.produce.inscription": "The Inscription can't be produced",
@@ -64,7 +67,11 @@
   "effect.chronicler_lh.hope_flower": "Hope Flower",
 
   "death.attack.cannotStop": "%s can't stop",
-  "death.attack.cannotStop.player": "%s can't stop"
+  "death.attack.cannotStop.player": "%s can't stop",
+
+  "config.chronicler_lh.general_settings": "General Settings",
+  "config.chronicler_lh.store_max": "Stored Items MAX",
+  "config.chronicler_lh.nbt_max": "Stored Tag NBT MAX"
 
 
 }
