@@ -4,6 +4,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityStellarisEnergy;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.inscription.IInscription;
 import net.mcbbs.lh_lshen.chronicler.inscription.InscriptionRegister;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
@@ -55,6 +56,8 @@ public class ProduceMessage extends BasicMessage {
                             sender.drop(itemStack.copy(),true);
                         }
                         energy.cost(1000);
+//                      按理说cap在之后会将数据再同步到客户端，但不知道为何未能成功，只能手动同步
+                        NBTHelper.putCapsTag(chroniciler);
                     }
                 }
             });

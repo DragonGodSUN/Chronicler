@@ -9,6 +9,9 @@ import net.minecraft.item.ItemStack;
 
 import java.util.List;
 
+/**
+ * 操作GUI各种组件的集合
+ */
 public class SelectCompnent {
     public int page;
     public List<Integer> stackList = Lists.newArrayList();;

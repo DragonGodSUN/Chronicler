@@ -20,7 +20,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-//感谢LocusAzzurro提供的关于loottable的技术支持
+//感谢@LocusAzzurro提供的关于loottable生成pool的技术指导
+//让自定义战利品表在想要的地方生成
 @Mod.EventBusSubscriber(modid = Utils.MOD_ID)
 public class LootTableModuleEvent {
     @SubscribeEvent

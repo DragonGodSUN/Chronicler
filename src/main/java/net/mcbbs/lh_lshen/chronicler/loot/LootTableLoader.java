@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 注册战利品相关loot table 与 loot function
+ */
 public class LootTableLoader {
     public static final ResourceLocation CHEST_RECORDER_SUPER = RegistrationHandler.create("chest/recorder_super");
     public static final ResourceLocation CHEST_INSCRIPTIONS = RegistrationHandler.create("chest/inscriptions");

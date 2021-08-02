@@ -4,6 +4,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityItemList;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -85,6 +86,7 @@ public class ManageItemListCapMessage {
                         c.setDirty(true);
                     }
                 });
+                NBTHelper.putCapsTag(itemHold);
             }
         }
     }

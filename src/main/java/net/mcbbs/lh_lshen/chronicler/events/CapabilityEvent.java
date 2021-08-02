@@ -23,22 +23,6 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber()
 public final class CapabilityEvent {
-//    private static final ResourceLocation ITEM_LIST = new ResourceLocation(Utils.MOD_ID, "item_list");
-//    private static final ResourceLocation ENERGY = new ResourceLocation(Utils.MOD_ID, "stellaris_energy");
-//    private static final ResourceLocation INSCRIPTION = new ResourceLocation(Utils.MOD_ID, "inscription");
-
-//    @SubscribeEvent
-//    public static void onAttachItemStackCapabilityEvent(AttachCapabilitiesEvent<ItemStack> event) {
-//        ItemStack itemStack = event.getObject();
-//        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemChronicler) {
-//            if (!itemStack.getOrCreateTag().getBoolean("hasCap")) {
-//                event.addCapability(ITEM_LIST, new ItemListProvider());
-//                event.addCapability(ENERGY, new StellarisEnergyProvider());
-//                event.addCapability(INSCRIPTION, new InscriptionProvider());
-//                itemStack.getOrCreateTag().putBoolean("hasCap",true);
-//            }
-//        }
-//    }
 
     @SubscribeEvent
     public static void onAttachEntityCapabilityEvent(AttachCapabilitiesEvent<Entity> event) {
@@ -47,21 +31,6 @@ public final class CapabilityEvent {
             event.addCapability(new ResourceLocation(Utils.MOD_ID, "inscription_effect"), new EffectPlayerProvider());
         }
     }
-//
-//    @SubscribeEvent
-//    public static void onItemUptateEvent(TickEvent.PlayerTickEvent event) {
-//        PlayerEntity player = event.player;
-//        for (int i=0;i<player.inventory.getContainerSize();i++) {
-//            ItemStack stack = player.inventory.getItem(i);
-//            if (stack.getItem() instanceof ItemChronicler){
-//                CompoundNBT nbt = stack.getOrCreateTag();
-//                long dirtyCounter = nbt.getLong("dirtyCounter");
-//                nbt.putLong("dirtyCounter", dirtyCounter + 1);
-//                stack.setTag(nbt);
-//            }
-//        }
-//    }
-
 
     @SubscribeEvent
     public static void onPlayerCloned(PlayerEvent.Clone event) {

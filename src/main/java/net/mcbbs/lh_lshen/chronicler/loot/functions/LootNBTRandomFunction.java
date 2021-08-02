@@ -15,6 +15,9 @@ import net.minecraft.util.math.MathHelper;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * 实现战利品表中随机产生一个刻印类型的方法
+ */
 public class LootNBTRandomFunction extends LootFunction {
 
     protected LootNBTRandomFunction(ILootCondition[] conditionsIn) {

@@ -17,6 +17,10 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.Optional;
 //  这里参考了酒石酸和Boson的代码实例
+
+/**
+ * 进行数据传输的枢纽，这里进行各项数据的注册和发送
+ */
 public class ChroniclerNetwork {
     public static final String VERSION = "1.0";
     public static final SimpleChannel INSTANCE =  NetworkRegistry.newSimpleChannel(new ResourceLocation(Utils.MOD_ID, "network"),

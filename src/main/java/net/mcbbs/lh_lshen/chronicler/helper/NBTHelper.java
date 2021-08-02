@@ -8,6 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 
+/**
+ * 进行NBT操作的工具类
+ */
 public class NBTHelper {
     public static CompoundNBT getSafeNBTCompond(ItemStack itemStack) {
         return itemStack.getOrCreateTag();

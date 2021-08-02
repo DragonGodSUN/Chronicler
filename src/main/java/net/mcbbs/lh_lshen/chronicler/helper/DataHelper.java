@@ -1,5 +1,6 @@
 package net.mcbbs.lh_lshen.chronicler.helper;
 
+import net.mcbbs.lh_lshen.chronicler.Config;
 import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityEffectPlayer;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
@@ -24,6 +25,9 @@ import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.UUID;
 
+/**
+ * 操作能力数据的工具类
+ */
 public class DataHelper {
 //  将服务端的数据发送给客户端的容器
 public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity player){
@@ -43,6 +47,7 @@ public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity playe
             ICapabilityItemList cap_list = itemStack.getCapability(ModCapability.ITEMLIST_CAPABILITY).orElse(null);;
             ICapabilityStellarisEnergy energy = itemStack.getCapability(ModCapability.ENERGY_CAPABILITY).orElse(null);
             ICapabilityInscription inscription = itemStack.getCapability(ModCapability.INSCRIPTION_CAPABILITY).orElse(null);
+//          强制客户端和服务端加载能力值
             if (cap_list!=null) {
                 cap_list.loadIfNotLoaded(itemStack);
             }
@@ -59,8 +64,10 @@ public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity playe
             ICapabilityItemList cap_list = getItemListCapability(itemStack);
             ICapabilityStellarisEnergy energy = getStellarisEnergyCapability(itemStack);
             ICapabilityInscription inscription = getInscriptionCapability(itemStack);
+//          防止客户端误操作
             if (!player.level.isClientSide()) {
-                if (energy.isDirty()&&player.tickCount%10 == 0 || cap_list.isDirty() || inscription.isDirty()) {
+//          同步储存物品与刻印数据，但其实没什么用，主要在GUI操作的过程中同步
+                if (cap_list.isDirty() || inscription.isDirty()) {
                     NBTHelper.putCapsTag(itemStack);
                     if (player.getMainHandItem().equals(itemStack)){
                         ChroniclerNetwork.sendToClientPlayer(new SynItemNBTInHandMessage(itemStack), player);
@@ -68,11 +75,24 @@ public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity playe
                         ChroniclerNetwork.sendToClientPlayer(new SynChroniclerMessage(itemStack),player);
                     }
                   cap_list.setDirty(false);
-                  energy.setDirty(false);
                   inscription.setDirty(false);
                 }
-                if (energy.isDirty() && player.containerMenu instanceof ContainerChronicler){
-                    ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
+                if (energy.isDirty()){
+//              由于是发送整个tag数据，为了减少服务器压力，默认情况下不同步
+                    if (Config.SYN_ENERGY.get()) {
+//              压缩能力数据到tag中
+                        NBTHelper.putCapsTag(itemStack);
+//              同步物品在客户端的数据
+                        if (player.getMainHandItem().equals(itemStack)){
+                            ChroniclerNetwork.sendToClientPlayer(new SynItemNBTInHandMessage(itemStack), player);
+                        }else {
+                            ChroniclerNetwork.sendToClientPlayer(new SynChroniclerMessage(itemStack),player);
+                        }
+                    }
+//              这里仅发送能量相关数据，体量较小，可实时同步
+                    if (player.containerMenu instanceof ContainerChronicler) {
+                        ChroniclerNetwork.sendToClientPlayer(new SynContainerEnergyCapMessage(ItemChronicler.getId(itemStack),energy), player);
+                    }
                     energy.setDirty(false);
                 }
             }
@@ -135,6 +155,7 @@ public static void synEnergyContanierCap(ItemStack itemStack, PlayerEntity playe
         return target;
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static PlayerEntity getClientPlayerNearby(String uuid){
         if (Minecraft.getInstance().player != null) {
             UUID u = UUID.fromString(uuid);

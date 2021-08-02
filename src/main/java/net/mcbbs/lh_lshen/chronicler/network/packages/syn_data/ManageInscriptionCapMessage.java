@@ -4,6 +4,7 @@ import net.mcbbs.lh_lshen.chronicler.capabilities.ModCapability;
 import net.mcbbs.lh_lshen.chronicler.capabilities.api.ICapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.capabilities.impl.CapabilityInscription;
 import net.mcbbs.lh_lshen.chronicler.helper.DataHelper;
+import net.mcbbs.lh_lshen.chronicler.helper.NBTHelper;
 import net.mcbbs.lh_lshen.chronicler.items.ItemChronicler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -64,6 +65,8 @@ public class ManageInscriptionCapMessage {
                 inscription.deserializeNBT(cap.serializeNBT());
                 inscription.setDirty(true);
             }
+//          按理说cap在之后会将数据再同步到客户端，但不知道为何未能成功，只能手动同步
+            NBTHelper.putCapsTag(hold);
         }
     }
 }

@@ -13,6 +13,9 @@ import net.minecraft.item.ItemStack;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 进行容器内数据操作的工具类
+ */
 public class StoreHelper {
 
     public static boolean hasItemStack(ICapabilityItemList capabilityItemList, ItemStack itemStack){
@@ -214,6 +217,7 @@ public class StoreHelper {
         return type;
     }
 
+//    在客户端对服务端数据进行操作的同步处理
     public static void synItemListCapabilityToSever(ItemStack chronicler, ICapabilityItemList capabilityItemList){
         ChroniclerNetwork.INSTANCE.sendToServer(new ManageItemListCapMessage(chronicler,capabilityItemList));
     }

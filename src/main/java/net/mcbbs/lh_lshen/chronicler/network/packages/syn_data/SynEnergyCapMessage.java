@@ -29,7 +29,7 @@ public class SynEnergyCapMessage {
     public static void encode(SynEnergyCapMessage message, PacketBuffer buf) {
         if (message.stack !=null && message.energy != null) {
             CompoundNBT compoundNBT = message.energy.serializeNBT();
-            buf.writeItemStack(message.stack,true);
+            buf.writeItemStack(message.stack,false);
             buf.writeNbt(compoundNBT);
         }
     }
@@ -61,12 +61,9 @@ public class SynEnergyCapMessage {
             return;
         }
         CapabilityStellarisEnergy cap = (CapabilityStellarisEnergy) message.energy;
-        if (player.inventory.contains(message.stack)){
-            CompoundNBT shareTag = message.stack.getShareTag();
-            if (shareTag!=null) {
-//                String id = shareTag.getString("ID");
-//                ItemStack stack = DataHelper.getItemStackByID(id,player.inventory);
-                ItemStack stack = ItemStack.EMPTY;
+        CompoundNBT tag = message.stack.getTag();
+        if (tag!=null) {
+            ItemStack stack = ItemStack.EMPTY;
             for (int i=0;i<player.inventory.getContainerSize();i++){
                 if (player.inventory.getItem(i).getItem() instanceof ItemChronicler){
                     if (ItemChronicler.getId(player.inventory.getItem(i)).equals(
@@ -78,13 +75,11 @@ public class SynEnergyCapMessage {
                 }
             }
             if (!stack.isEmpty()) {
-//                ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
-//                if (cap!=null && energy!=null){
-//                    energy.deserializeNBT(cap.serializeNBT());
-//                }
-                stack.readShareTag(shareTag);
-            }
-
+                ICapabilityStellarisEnergy energy = DataHelper.getStellarisEnergyCapability(stack);
+                if (cap!=null && energy!=null){
+                    energy.deserializeNBT(cap.serializeNBT());
+                }
+//                stack.readShareTag(shareTag);
             }
         }
 

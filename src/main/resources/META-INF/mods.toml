@@ -34,7 +34,12 @@ logoFile="logo.png" #optional
 authors="LH_Lshen(无极真炎)" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Just for fun !
+Take along the chronicler
+Embark on a journey to the stars
+The way is arduous and long
+Just keep the fiath
+Just move on
+You will find of the universe
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.chronicler_lh]] #optional

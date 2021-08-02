@@ -64,6 +64,7 @@ public class ItemChronicler extends Item {
                     if (iInscription!=null){
                         iInscription.tickEffect(entity,itemStack);
                     }
+//                  当数据发送变动时，根据需求进行数据同步
                     DataHelper.synChroniclerCaps(itemStack, (PlayerEntity) entity);
                 }
             }
@@ -98,6 +99,7 @@ public class ItemChronicler extends Item {
                     energy.resetMax();
                     DataHelper.synChroniclerCaps(itemStack, playerEntity);
                 }
+                NBTHelper.putCapsTag(itemStack);
                 openGUI(itemStack, (ServerPlayerEntity) playerEntity);
             }
             playerEntity.playSound(SoundEvents.BOOK_PAGE_TURN,2f,1f);
@@ -120,9 +122,12 @@ public class ItemChronicler extends Item {
         if (isKeyDown) {
             tooltips.add(new StringTextComponent(TextFormatting.GRAY+getId(itemStack)));
         }
-        tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy",""+TextFormatting.AQUA+energy.getEnergyPoint()));
-        if (isKeyDown){
-            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy.max",""+TextFormatting.AQUA+energy.getEnergyMax()));
+//      由于是发送整个tag数据，为了减少服务器压力，默认情况下不同步
+        if (Config.SYN_ENERGY.get()) {
+            tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy",""+TextFormatting.AQUA+energy.getEnergyPoint()));
+            if (isKeyDown){
+                tooltips.add(new TranslationTextComponent("tooltip.chronicler_lh.chronicler.energy.max",""+TextFormatting.AQUA+energy.getEnergyMax()));
+            }
         }
         if (!inscription.getInscription().isEmpty()) {
             tooltips.add(new StringTextComponent(I18n.get("tooltip.chronicler_lh.chronicler.inscription")
@@ -226,6 +231,7 @@ public class ItemChronicler extends Item {
         return false;
     }
 
+//  设置该物品的id，为同步数据提供识别特征
     public static void setId(ItemStack stack, String id){
         CompoundNBT compoundNBT = stack.getOrCreateTag();
         compoundNBT.putString("ID",id);
@@ -252,14 +258,10 @@ public class ItemChronicler extends Item {
     @Nullable
     @Override
     public CompoundNBT getShareTag(ItemStack stack) {
-//        NBTHelper.putCapsTag(stack);
-//        if (stack.getTag()!=null) {
-//            return stack.getTag();
-//        }
         return super.getShareTag(stack);
     }
 
-
+// 在readShareTag阶段进行重写，读取传输过来的tag信息，将其解码为能力
     @Override
     public void readShareTag(ItemStack stack, @Nullable CompoundNBT nbt) {
         if (nbt == null) {
